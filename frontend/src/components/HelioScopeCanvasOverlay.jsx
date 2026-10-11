@@ -284,6 +284,49 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   const [localMove, setLocalMove] = useState(false);
   const [pitchAuto, setPitchAuto] = useState(true); // true = winter-shadow AUTO pitch (tilt-linked)
 
+  // ★ Sun Time Simulation
+  const [timeSim, setTimeSim] = useState(false);
+  const [sunHour, setSunHour] = useState(12);
+  const [sunDay, setSunDay] = useState(172); // Jun 21
+  const [playing, setPlaying] = useState(false);
+  const timeSimRef = useRef(false);
+  const simSunRef = useRef({ elevationDeg: 45, azimuthDeg: 180 });
+  const playIntervalRef = useRef(null);
+
+  useEffect(() => {
+    if (!timeSim) {
+      timeSimRef.current = false;
+      requestRedraw();
+      return;
+    }
+    simSunRef.current = calculateSolarPosition(siteLatitude, sunDay, sunHour);
+    timeSimRef.current = true;
+    requestRedraw();
+  }, [timeSim, sunDay, sunHour, siteLatitude, requestRedraw]);
+
+  useEffect(() => () => {
+    if (playIntervalRef.current) clearInterval(playIntervalRef.current);
+  }, []);
+
+  const toggleSunPlay = () => {
+    if (playIntervalRef.current) {
+      clearInterval(playIntervalRef.current);
+      playIntervalRef.current = null;
+      setPlaying(false);
+      return;
+    }
+    setPlaying(true);
+    playIntervalRef.current = setInterval(() => {
+      setSunHour(h => (h >= 18.5 ? 5.5 : Math.round((h + 0.25) * 100) / 100));
+    }, 120);
+  };
+
+  const seasonPresets = [
+    { label: "Jun 21", day: 172 },
+    { label: "Mar/Sep 21", day: 80 },
+    { label: "Dec 21", day: 355 }
+  ];
+
   // Top-Level Hoisted Redraw Dispatcher (Safe from Temporal Dead Zone / TDZ errors)
   const requestRedraw = useCallback(() => {
     if (isDrawScheduledRef.current) return;
@@ -959,8 +1002,10 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
 
         // Ambient Occlusion Drop Shadow proportional to tilt angle
         if (showShadows) {
-          const elevRad = (Math.max(10, solarElevation) * Math.PI) / 180;
-          const azRad = (solarAzimuth * Math.PI) / 180;
+          const effElev = timeSimRef.current ? simSunRef.current.elevationDeg : solarElevation;
+          const effAzim = timeSimRef.current ? simSunRef.current.azimuthDeg : solarAzimuth;
+          const elevRad = (Math.max(5, effElev) * Math.PI) / 180;
+          const azRad = (effAzim * Math.PI) / 180;
           // Tilt-scaled shadow — deeper tilt casts a more pronounced row shadow
           const tiltFactor = Math.sin((tiltDegrees * Math.PI) / 180);
           const shadowDistPx = Math.min(12, Math.max(2, (3 + tiltFactor * 6) / Math.tan(elevRad)));
@@ -1003,8 +1048,8 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         // 1. Dynamic Sun Position Shadow Projection (rendered under the panel)
         if (showShadows) {
           // Get active sun altitude & azimuth (default: Jun 21 solar noon if not selected)
-          const sunAlt = Math.max(5, Number(sunAltitudeDeg ?? solarElevation ?? 45));
-          const sunAz = Number(sunAzimuthDeg ?? solarAzimuth ?? 180);
+          const sunAlt = timeSimRef.current ? Math.max(5, simSunRef.current.elevationDeg) : Math.max(5, Number(sunAltitudeDeg ?? solarElevation ?? 45));
+          const sunAz = timeSimRef.current ? simSunRef.current.azimuthDeg : Number(sunAzimuthDeg ?? solarAzimuth ?? 180);
 
           // Shadow length depends on panel elevation/tilt and sun angle:
           const effLength = Number(pLengthM) || 2.278;
@@ -2611,6 +2656,50 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         >
           {effLock ? "🔒 Locked" : "🔓 Unlocked"}
         </button>
+      </div>
+
+      {/* ★ Sun Time Simulation — Season presets + Hour slider + Play */}
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          transform: "translateX(-50%)",
+          bottom: 12,
+          zIndex: 950,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "8px 12px",
+          borderRadius: 12,
+          background: "rgba(8,15,30,0.88)",
+          border: "1px solid rgba(56,189,248,0.25)",
+          backdropFilter: "blur(8px)",
+          pointerEvents: "auto"
+        }}
+      >
+        <button type="button" onClick={() => setTimeSim(v => !v)} style={ctrlBtnStyle(timeSim)}>
+          {timeSim ? "☀ Sim ON" : "☀ Sim OFF"}
+        </button>
+        {timeSim && (
+          <>
+            {seasonPresets.map(sp => (
+              <button key={sp.label} type="button" onClick={() => setSunDay(sp.day)} style={chipStyle(sunDay === sp.day)}>
+                {sp.label}
+              </button>
+            ))}
+            <input
+              type="range" min="5.5" max="18.5" step="0.25" value={sunHour}
+              onChange={(e) => setSunHour(parseFloat(e.target.value))}
+              style={{ width: 160, accentColor: "#38bdf8" }}
+            />
+            <span style={{ color: "#facc15", fontFamily: "monospace", fontSize: 11, fontWeight: 700, minWidth: 48 }}>
+              {String(Math.floor(sunHour)).padStart(2, "0")}:{String(Math.round((sunHour % 1) * 60)).padStart(2, "0")}
+            </span>
+            <button type="button" onClick={toggleSunPlay} style={ctrlBtnStyle(playing)}>
+              {playing ? "⏸ Pause" : "▶ Play"}
+            </button>
+          </>
+        )}
       </div>
 
       {/* Floating Right-Click Roof Edge Alignment Context Menu */}
