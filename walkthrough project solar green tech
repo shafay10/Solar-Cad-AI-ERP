@@ -1,0 +1,97 @@
+# Solar ERP Platform (C&I & Utility Scale) — Implementation Walkthrough
+
+The full-stack Solar ERP & Field Operations Platform has been built with clean, modular, production-ready code with no cluttered or redundant comments.
+
+---
+
+## 1. Architecture & Tech Stack
+
+- **Backend**: Node.js & Express REST API on `http://localhost:5000` with JWT authentication, role-based access control (`SUPER_ADMIN`, `SURVEY_ENGINEER`, `DESIGN_ENGINEER`, `SALES_MANAGER`), and PostgreSQL DDL schema with 8 connected tables.
+- **Frontend**: React (Vite) on `http://localhost:3000`, Tailwind CSS, Lucide React, Leaflet.js (OpenStreetMap & ESRI World Imagery), HTML5 DeviceOrientation API, and jsPDF / AutoTable.
+- **Theme**: Dark enterprise Glassmorphism (Slate-950 background with Cyan-400 and Emerald-400 neon accents).
+
+---
+
+## 2. Complete Module Implementation Details
+
+### Module A: Mobile PWA Field Survey & Photogrammetry
+- **Interactive Satellite Map**: Toggleable ESRI World Imagery and OpenStreetMap tile layers.
+- **GPS Coordinates Locking**: Pin site coordinates with real-time latitude, longitude, and site address locking.
+- **Roof Polygon Area Measurement**: Multi-vertex polygon drawing tool on map with real-time **Shoelace formula** calculating usable area in sq ft and $\text{m}^2$.
+- **Photogrammetric Gyroscope Tool**: Connects to HTML5 `DeviceOrientationEvent` with dynamic Roof Pitch ($0^\circ–90^\circ$) and Azimuth compass ($0^\circ–360^\circ$) indicators and fallback desktop sliders.
+- **Categorized Media Upload Dropzone**: 6 categories with real-time previews: `Roof Surface`, `Electrical Panel`, `Cable Route`, `Inverter Location`, `Transformer`, and `Obstructions`.
+
+### Module B: CAD Design & MPPT Solar Stringing Matcher
+- **PV Module Specifications**: Support for 550W, 585W, 650W, and 700W N-Type TOPCon bifacial modules.
+- **Temperature-Corrected String Validation**:
+  - Winter $V_{oc}$ at $-5^\circ\text{C}$ ($V_{oc} \times [1 + \gamma_{voc} \times (-5 - 25)] \times N$)
+  - Summer $V_{mp}$ at $+55^\circ\text{C}$ ($V_{mp} \times [1 + \gamma_{vmp} \times (55 - 25)] \times N$)
+  - Temperature coefficient: $-0.28\%/^\circ\text{C}$
+- **Visual Safe-Zone Gauge Indicator**: Inverter MPPT range ($500\text{V}–1000\text{V}$) and maximum PV limit ($1100\text{V}$).
+- **Auto-Optimize Stringing**: Automatically discovers optimal stringing sizes.
+
+### Module C: Dynamic L1 / L2 / L3 Multi-Scale BOQ Engine
+- **Capacity Scaling**: Dynamic calculations from residential setups (5kW–25kW) to multi-megawatt farms (1MW–50MW+).
+- **Multi-Tier Views**:
+  - **L1 (Executive Summary)**: High-level cost heads ($/W or $/kW rates).
+  - **L2 (Component Level)**: Module count, Inverter specs, HDG structure, DC/AC cable lengths, MCCB/SPDs.
+  - **L3 (Granular Industrial EPC)**: SS304 mid/end clamps, perforated GI cable trays, chemical earthing rods ($< 1\,\Omega$), C25/30 reinforced concrete plinths ($\text{m}^3$), and SCADA weather stations.
+
+### Module D: Enterprise Financial ROI & ESG Metrics
+- **25-Year Life Cycle**: 0.5% annual degradation, 3.5% grid tariff escalation, and 1.2% OPEX maintenance.
+- **NPV**: Net Present Value calculated over 25 years at a 9.0% discount rate.
+- **IRR & LCOE**: Internal Rate of Return and Levelized Cost of Energy compared against grid utility tariffs ($0.160/kWh).
+- **Payback Period**: Accurate payback displayed in years and months.
+- **ESG Carbon Offset**: Annual and 25-year $\text{CO}_2$ avoidance with equivalent trees planted.
+- **Interactive 25-Year Cash Flow Visualization**: Visual break-even and cumulative cash flow chart.
+
+### Module E: Triple Super Admin Locking & PDF Proposals
+- **Proposal Edit Lock**: When engaged by a Super Admin (`is_locked = true`), capacity, quantities, and pricing are cryptographically locked against unauthorized modifications.
+- **Immutable Audit Trail**: Tracks User ID, role, action, IP address, timestamp, and JSON diffs.
+- **Branded PDF Export**: Exports styled, client-ready proposals with company header, executive summary, CAD stringing table, BOQ breakdown, and 25-year financial metrics.
+
+---
+
+## 3. Database Schema (PostgreSQL DDL)
+
+The complete 8-table relational schema is in [`backend/database/schema.sql`](file:///c:/Users/HP/.gemini/antigravity/scratch/solar-erp-platform/backend/database/schema.sql):
+1. `users`
+2. `projects`
+3. `field_surveys`
+4. `survey_media`
+5. `cad_designs`
+6. `quotations`
+7. `financial_projections`
+8. `audit_logs`
+
+---
+
+## 4. Verification Results
+
+| Test Item | Endpoint / Command | Status | Result |
+| :--- | :--- | :--- | :--- |
+| **Backend Health** | `GET /api/health` | **200 OK** | Platform ONLINE (v2.0.0-GOLD) |
+| **BOQ Engine API** | `POST /api/boq/calculate` | **200 OK** | Scaled 350kW ($0.69/W, 599 modules, L2 components) |
+| **CAD String Validation** | `POST /api/cad/validate-strings` | **200 OK** | 18 panels: Winter $V_{oc} = 1004.9\text{V}$, Summer $V_{mp} = 712.3\text{V}$ (Safe) |
+| **Financial ROI & ESG** | `POST /api/financial/calculate` | **200 OK** | NPV: +$838k, IRR: 38.4%, Payback: 2 yrs 9 mos, ESG: 398.2 Tons $\text{CO}_2$/yr |
+| **Shoelace Polygon Area** | `POST /api/surveys/calculate-area` | **200 OK** | Real-time calculation: $6,354.16\,\text{m}^2$ ($68,395.54\,\text{sq ft}$) |
+| **Projects API** | `GET /api/projects` | **200 OK** | 2 active projects seeded & accessible |
+| **Frontend Production Build** | `npm run build` | **SUCCESS** | Vite bundle compiled in 52s |
+| **Frontend Dev Server** | `http://localhost:3000` | **200 OK** | Dark glassmorphic UI loaded |
+
+---
+
+## 5. How to Run Locally
+
+Both servers are active:
+- **Frontend App**: [http://localhost:3000](http://localhost:3000)
+- **Backend API**: [http://localhost:5000](http://localhost:5000)
+
+To start them manually at any time:
+```bash
+# Terminal 1 - Backend
+cd backend && npm start
+
+# Terminal 2 - Frontend
+cd frontend && npm run dev
+```

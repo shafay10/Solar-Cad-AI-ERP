@@ -1,0 +1,215 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  SURVEY_ENGINEER
+  DESIGN_ENGINEER
+  SALES_MANAGER
+}
+
+model User {
+  id            String        @id @default(uuid()) @db.Uuid
+  fullName      String        @map("full_name") @db.VarChar(100)
+  email         String        @unique @db.VarChar(150)
+  passwordHash  String        @map("password_hash") @db.VarChar(255)
+  role          Role          @default(SURVEY_ENGINEER)
+  isApproved    Boolean       @default(false) @map("is_approved")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  sessions      UserSession[]
+  projects      Project[]     @relation("ProjectCreator")
+  approvals     Project[]     @relation("AdminApprover")
+
+  @@map("users")
+}
+
+model UserSession {
+  id                     String    @id @default(uuid()) @db.Uuid
+  userId                 String    @map("user_id") @db.Uuid
+  loginTimestamp         DateTime  @default(now()) @map("login_timestamp")
+  logoutTimestamp        DateTime? @map("logout_timestamp")
+  sessionDurationMinutes Int?      @map("session_duration_minutes")
+  ipAddress              String?   @map("ip_address") @db.VarChar(45)
+  user                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+model Project {
+  id                 String       @id @default(uuid()) @db.Uuid
+  projectCode        String?      @unique @map("project_code") @db.VarChar(50)
+  clientName         String       @map("client_name") @db.VarChar(255)
+  clientCnic         String?      @map("client_cnic") @db.VarChar(30)
+  siteAddress        String       @map("site_address") @db.Text
+  subDivision        String?      @map("sub_division") @db.VarChar(150)
+  latitude           Float?
+  longitude          Float?
+  systemCapacityKw   Float        @default(0) @map("system_capacity_kw")
+  contractPricePkr   Decimal      @default(0) @map("contract_price_pkr") @db.Decimal(14, 2)
+  estimatedCostPkr   Decimal      @default(0) @map("estimated_cost_pkr") @db.Decimal(14, 2)
+  netProfitPkr       Decimal      @default(0) @map("net_profit_pkr") @db.Decimal(14, 2)
+  dealCloseDate      DateTime     @default(now()) @map("deal_close_date")
+  targetDeliveryDate DateTime?    @map("target_delivery_date")
+  projectDetails     String?      @map("project_details") @db.Text
+  status             String       @default("ONBOARDED") @db.VarChar(50)
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @default(now()) @updatedAt @map("updated_at")
+  
+  // Strict Audit Timestamps
+  surveyUploadedAt   DateTime?    @map("survey_uploaded_at")
+  boqSubmittedAt     DateTime?    @map("boq_submitted_at")
+  adminApprovedAt    DateTime?    @map("admin_approved_at")
+  siteCompletedAt    DateTime?    @map("site_completed_at")
+  completionYear     Int?         @map("completion_year")
+  
+  createdBy          String?      @map("created_by") @db.Uuid
+  approvedBy         String?      @map("approved_by") @db.Uuid
+  creator            User?        @relation("ProjectCreator", fields: [createdBy], references: [id])
+  approver           User?        @relation("AdminApprover", fields: [approvedBy], references: [id])
+  
+  surveyData         SiteSurvey?
+  quotation          Quotation?
+  solarDesign        SolarDesign?
+
+  @@map("projects")
+}
+
+model SiteSurvey {
+  id                 String   @id @default(uuid()) @db.Uuid
+  projectId          String   @unique @map("project_id") @db.Uuid
+  panelBrand         String   @map("panel_brand")
+  panelModel         String   @map("panel_model")
+  panelWattage       Int      @map("panel_wattage")
+  panelQuantity      Int      @map("panel_quantity")
+  inverterType       String   @map("inverter_type")
+  inverterBrand      String   @map("inverter_brand")
+  inverterCapacityKw Decimal  @map("inverter_capacity_kw") @db.Decimal(8, 2)
+  structureType      String   @map("structure_type") // L2, L3, Customized
+  frontHeightMm      Decimal? @map("front_height_mm") @db.Decimal(8, 2)
+  backHeightMm       Decimal? @map("back_height_mm") @db.Decimal(8, 2)
+  tiltAngle          Decimal? @map("tilt_angle") @db.Decimal(5, 2)
+  azimuthDirection   String?  @map("azimuth_direction")
+  batteryType        String?  @map("battery_type")
+  batteryBrand       String?  @map("battery_brand")
+  cableBrand         String   @map("cable_brand")
+  cableSize          String   @map("cable_size")
+  cableLengthMeters  Decimal  @map("cable_length_meters") @db.Decimal(8, 2)
+  earthingJobPrice   Decimal  @map("earthing_job_price") @db.Decimal(12, 2)
+  civilWorkPrice     Decimal  @map("civil_work_price") @db.Decimal(12, 2)
+  installationPrice  Decimal  @map("installation_price") @db.Decimal(12, 2)
+  netMeteringPrice   Decimal  @map("net_metering_price") @db.Decimal(12, 2)
+  includeSld         Boolean  @default(true) @map("include_sld")
+  roofPolygonJson    Json?    @map("roof_polygon_json")
+  aiSummaryText      String?  @map("ai_summary_text") @db.Text
+  project            Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("site_surveys")
+}
+
+model Quotation {
+  id               String   @id @default(uuid()) @db.Uuid
+  projectId        String   @unique @map("project_id") @db.Uuid
+  systemCapacityKw Decimal  @map("system_capacity_kw") @db.Decimal(10, 2)
+  internalCostPkr  Decimal  @map("internal_cost_pkr") @db.Decimal(15, 2)
+  clientSellingPkr Decimal  @map("client_selling_pkr") @db.Decimal(15, 2)
+  marginPkr        Decimal  @map("margin_pkr") @db.Decimal(15, 2)
+  isLocked         Boolean  @default(false) @map("is_locked")
+  signedAt         DateTime? @map("signed_at")
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("quotations")
+}
+
+// =========================================================================
+// SOLAR DESIGN STUDIO MODELS (HELIOSCOPE SUITE)
+// =========================================================================
+
+model SolarPanel {
+  id                  String   @id @default(uuid()) @db.Uuid
+  manufacturer        String   @db.VarChar(100)
+  modelName           String   @unique @map("model_name") @db.VarChar(150)
+  wattage             Int
+  efficiency          Float
+  lengthMm            Int      @map("length_mm")
+  widthMm             Int      @map("width_mm")
+  thicknessMm         Int      @default(30) @map("thickness_mm")
+  weightKg            Float    @map("weight_kg")
+  voc                 Float
+  vmp                 Float
+  isc                 Float
+  imp                 Float
+  tempCoeffPmax       Float    @default(-0.0030) @map("temp_coeff_pmax")
+  tempCoeffVoc        Float    @default(-0.0028) @map("temp_coeff_voc")
+  warrantyYears       Int      @default(25) @map("warranty_years")
+  pricePerUnit        Decimal  @default(0) @map("price_per_unit") @db.Decimal(12, 2)
+  isDefault           Boolean  @default(false) @map("is_default")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("solar_panels")
+}
+
+model Inverter {
+  id                    String   @id @default(uuid()) @db.Uuid
+  manufacturer          String   @db.VarChar(100)
+  modelName             String   @unique @map("model_name") @db.VarChar(150)
+  type                  String   @default("string") @db.VarChar(50)
+  ratedAcOutputKw       Float    @map("rated_ac_output_kw")
+  maxDcInputVoltage     Float    @map("max_dc_input_voltage")
+  mpptRangeMin          Float    @map("mppt_range_min")
+  mpptRangeMax          Float    @map("mppt_range_max")
+  numberOfMpptInputs    Int      @default(2) @map("number_of_mppt_inputs")
+  maxInputCurrentPerMppt Float   @default(30.0) @map("max_input_current_per_mppt")
+  efficiencyPct         Float    @default(98.6) @map("efficiency_pct")
+  warrantyYears         Int      @default(5) @map("warranty_years")
+  pricePerUnit          Decimal  @default(0) @map("price_per_unit") @db.Decimal(12, 2)
+  isDefault             Boolean  @default(false) @map("is_default")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("inverters")
+}
+
+model RackingSystem {
+  id            String   @id @default(uuid()) @db.Uuid
+  name          String   @db.VarChar(100)
+  type          String   @db.VarChar(50)
+  tiltRangeMin  Float    @default(5) @map("tilt_range_min")
+  tiltRangeMax  Float    @default(45) @map("tilt_range_max")
+  material      String   @default("Hot-Dip Galvanized HDG (80µm)")
+  windRatingKmh Float    @default(150) @map("wind_rating_kmh")
+  pricePerKwp   Decimal  @default(0) @map("price_per_kwp") @db.Decimal(12, 2)
+  isDefault     Boolean  @default(false) @map("is_default")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("racking_systems")
+}
+
+model SolarDesign {
+  id                 String       @id @default(uuid()) @db.Uuid
+  projectId          String       @unique @map("project_id") @db.Uuid
+  siteAddress        String?      @map("site_address")
+  latitude           Float?
+  longitude          Float?
+  roofType           String?      @map("roof_type")
+  usableAreaSqM      Float?       @map("usable_area_sq_m")
+  gridConnectionType String?      @map("grid_connection_type")
+  satelliteImageUrl  String?      @map("satellite_image_url")
+  totalSystemKw      Float        @default(0) @map("total_system_kw")
+  totalModuleCount   Int          @default(0) @map("total_module_count")
+  estimatedAnnualKwh Float        @default(0) @map("estimated_annual_kwh")
+  performanceRatio   Float        @default(81.5) @map("performance_ratio")
+
+  project            Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @default(now()) @updatedAt @map("updated_at")
+
+  @@map("solar_designs")
+}

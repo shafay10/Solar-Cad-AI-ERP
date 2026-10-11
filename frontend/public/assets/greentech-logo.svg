@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Radial Gradient -->
+    <radialGradient id="gtBgGrad" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="65%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#020617" />
+    </radialGradient>
+
+    <!-- Outer Ring Gradient -->
+    <linearGradient id="gtRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="50%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+
+    <!-- Blue Wing Gradient -->
+    <linearGradient id="gtBlueWing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#1e40af" />
+    </linearGradient>
+
+    <!-- Green Wing Gradient -->
+    <linearGradient id="gtGreenWing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ade80" />
+      <stop offset="50%" stop-color="#16a34a" />
+      <stop offset="100%" stop-color="#15803d" />
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="gtGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#10b981" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Circular Base - Exactly Fills 512x512 Canvas -->
+  <circle cx="256" cy="256" r="254" fill="url(#gtBgGrad)" />
+
+  <!-- Outer Ring Accent -->
+  <circle cx="256" cy="256" r="248" fill="none" stroke="url(#gtRingGrad)" stroke-width="7" opacity="0.9" />
+
+  <!-- Center Energy Leaf & Lightning Symbol -->
+  <g filter="url(#gtGlow)">
+    <!-- Left Blue Wing (Fluid Water/Energy Drop) -->
+    <path 
+      d="M 256,92 C 228,124 156,206 156,260 C 156,310 196,338 256,338 L 256,248 L 222,248 L 268,162 L 256,92 Z" 
+      fill="url(#gtBlueWing)"
+    />
+    
+    <!-- Right Green Wing (Solar Clean Energy Leaf) -->
+    <path 
+      d="M 256,92 C 284,124 356,206 356,260 C 356,310 316,338 256,338 L 256,248 L 290,248 L 244,316 L 256,92 Z" 
+      fill="url(#gtGreenWing)"
+    />
+
+    <!-- High-Voltage Electric Cutout -->
+    <polygon 
+      points="268,145 228,236 264,236 242,316 284,224 248,224" 
+      fill="#020617" 
+      stroke="#38bdf8" 
+      stroke-width="2.5" 
+      stroke-linejoin="round"
+    />
+  </g>
+
+  <!-- Wordmark: GREEN TECH -->
+  <text 
+    x="256" 
+    y="392" 
+    text-anchor="middle" 
+    font-family="'Inter', 'Montserrat', -apple-system, sans-serif" 
+    font-weight="900" 
+    font-size="44" 
+    letter-spacing="3"
+  >
+    <tspan fill="#22c55e">GREEN </tspan>
+    <tspan fill="#38bdf8">TECH</tspan>
+  </text>
+
+  <!-- Power Trio Dots Accent -->
+  <circle cx="256" cy="424" r="4.5" fill="#10b981" />
+  <circle cx="240" cy="424" r="2.8" fill="#38bdf8" opacity="0.75" />
+  <circle cx="272" cy="424" r="2.8" fill="#22c55e" opacity="0.75" />
+</svg>

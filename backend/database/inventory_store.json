@@ -1,0 +1,26 @@
+{
+  "inventory": [],
+  "systemStockAllocations": [],
+  "inventoryAuditLogs": [
+    {
+      "id": "aud-1789483963755-il0y",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "MOCK_DATA_CLEARED",
+      "dayOfWeek": "Tuesday",
+      "date": "15-Sep-2026",
+      "dateWithDay": "Tuesday, 15-Sep-2026",
+      "time": "07:52:43 PM (PKT)",
+      "pktTimestamp": "Tuesday, 15-Sep-2026 | 07:52:43 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-15T14:52:43.754Z",
+      "ipAddress": "::1",
+      "signatureHash": "2732adae4b2a08b3fff35822e53f88167680d5d87a5e7c3a80e8dcfe8160bf2c",
+      "details": {
+        "notes": "Admin / Warehouse Keeper purged all dummy AI inventory data. Real zero stock slate established."
+      }
+    }
+  ],
+  "purchasingReceipts": []
+}

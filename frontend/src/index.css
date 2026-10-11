@@ -1,0 +1,431 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background-color: #059669;
+    color: #ffffff;
+  }
+}
+
+/* ==========================================================================
+   MODERN EXECUTIVE SAAS DESIGN SYSTEM (Solar ERP)
+   Inspired directly by high-end clean SaaS dashboards:
+   - Crisp white floating cards with generous rounding and soft ambient shadow
+   - Vibrant emerald green highlights (#059669 / #10b981)
+   - Deep charcoal contrast (#0f172a / #1e293b) for key metrics & charts
+   - High-contrast pure white text on solid colored buttons & badges
+   ========================================================================== */
+
+/* 1. Floating SaaS Card Container */
+.card-saas {
+  background-color: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 1.25rem;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 4px 12px -2px rgba(0, 0, 0, 0.02);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card-saas:hover {
+  box-shadow: 0 14px 35px -5px rgba(0, 0, 0, 0.06), 0 6px 16px -2px rgba(0, 0, 0, 0.03);
+}
+
+/* 2. Quick-Action Floating Pill (Matching "Auto Assign Tasks" & "Resource Scheduling") */
+.pill-action {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  cursor: pointer;
+}
+
+.pill-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(5, 150, 105, 0.15);
+  border-color: #10b981;
+}
+
+/* 3. Primary Buttons */
+.btn-emerald {
+  background-color: #059669;
+  color: #ffffff !important;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.25rem;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-emerald:hover {
+  background-color: #047857;
+  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-emerald:active {
+  transform: translateY(0);
+}
+
+/* 4. Circular Progress Gauges (Donuts) */
+.gauge-track {
+  stroke: #f1f5f9;
+}
+
+.gauge-progress {
+  stroke: #10b981;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 5. Custom Clean Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 6. Leaflet Map Container & Popups */
+.leaflet-container {
+  border-radius: 1rem;
+  font-family: inherit;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 0.25rem !important;
+}
+
+.leaflet-popup-tip {
+  background: #ffffff !important;
+}
+
+/* ==========================================================================
+   ORIGINAL CYBER DARK SLATE THEME (Exact match to user's laptop screenshots)
+   Activated whenever html has class 'dark' or 'theme-dark'
+   ========================================================================== */
+html.dark,
+html.theme-dark {
+  color-scheme: dark;
+}
+
+html.dark body,
+html.theme-dark body {
+  background-color: #090d16 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Header in Dark Mode */
+html.dark header,
+html.theme-dark header {
+  background-color: rgba(15, 23, 42, 0.96) !important;
+  border-bottom-color: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+
+/* Primary SaaS Cards in Dark Mode */
+html.dark .card-saas,
+html.theme-dark .card-saas,
+html.dark .bg-white,
+html.theme-dark .bg-white {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Inset containers, telemetry boxes, secondary sections */
+html.dark .bg-slate-50,
+html.theme-dark .bg-slate-50,
+html.dark [class*="bg-slate-50/"],
+html.theme-dark [class*="bg-slate-50/"],
+html.dark .bg-slate-100,
+html.theme-dark .bg-slate-100 {
+  background-color: #090d16 !important;
+  border-color: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+
+/* Text colors in Dark Mode */
+html.dark .text-slate-900,
+html.theme-dark .text-slate-900,
+html.dark .text-slate-800,
+html.theme-dark .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-slate-700,
+html.theme-dark .text-slate-700,
+html.dark .text-slate-600,
+html.theme-dark .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-500,
+html.theme-dark .text-slate-500,
+html.dark .text-slate-400,
+html.theme-dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+/* Borders in Dark Mode */
+html.dark .border-slate-100,
+html.theme-dark .border-slate-100,
+html.dark .border-slate-200,
+html.theme-dark .border-slate-200,
+html.dark .border-slate-300,
+html.theme-dark .border-slate-300 {
+  border-color: #1e293b !important;
+}
+
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+html.theme-dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]),
+html.theme-dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #1e293b !important;
+}
+
+/* Table Headers & Rows in Dark Mode */
+html.dark thead,
+html.theme-dark thead {
+  background-color: #090d16 !important;
+  border-color: #1e293b !important;
+  color: #94a3b8 !important;
+}
+
+html.dark tr[class*="hover:bg-slate-"]:hover,
+html.theme-dark tr[class*="hover:bg-slate-"]:hover,
+html.dark tr:hover,
+html.theme-dark tr:hover {
+  background-color: rgba(30, 41, 59, 0.4) !important;
+}
+
+/* Floating Action Pills in Dark Mode */
+html.dark .pill-action,
+html.theme-dark .pill-action {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .pill-action:hover,
+html.theme-dark .pill-action:hover {
+  border-color: #06b6d4 !important;
+  box-shadow: 0 8px 24px -4px rgba(6, 182, 212, 0.3) !important;
+}
+
+/* Circular Donut Gauges in Dark Mode */
+html.dark .gauge-track,
+html.theme-dark .gauge-track {
+  stroke: #1e293b !important;
+}
+
+html.dark .gauge-progress,
+html.theme-dark .gauge-progress {
+  stroke: #22d3ee !important; /* Cyber cyan ring in dark mode */
+}
+
+/* Form Controls in Dark Mode */
+html.dark input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+html.theme-dark input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+html.dark select,
+html.theme-dark select,
+html.dark textarea,
+html.theme-dark textarea {
+  background-color: #090d16 !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html.dark input:focus,
+html.theme-dark input:focus,
+html.dark select:focus,
+html.theme-dark select:focus {
+  border-color: #06b6d4 !important;
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.25) !important;
+}
+
+/* Badges in Dark Mode */
+html.dark .bg-emerald-50,
+html.theme-dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  color: #34d399 !important;
+}
+
+html.dark .text-emerald-700,
+html.theme-dark .text-emerald-700,
+html.dark .text-emerald-800,
+html.theme-dark .text-emerald-800 {
+  color: #34d399 !important;
+}
+
+/* Leaflet Popups in Dark Mode */
+html.dark .leaflet-popup-content-wrapper,
+html.theme-dark .leaflet-popup-content-wrapper {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #1e293b !important;
+}
+
+html.dark .leaflet-popup-tip,
+html.theme-dark .leaflet-popup-tip {
+  background-color: #0f172a !important;
+}
+
+/* ==========================================
+   PRINT STYLES: 2-PAGE OFFICIAL QUOTATION
+   ========================================== */
+@media print {
+  html, body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Universal print isolation: Hide everything except #printable-quotation */
+  body * {
+    visibility: hidden;
+  }
+
+  #printable-quotation,
+  #printable-quotation * {
+    visibility: visible !important;
+  }
+
+  #printable-quotation {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Hide navigation, sidebar, toolbars, buttons, controls, banners during print */
+  nav,
+  aside,
+  header,
+  footer,
+  .no-print,
+  .print\:hidden,
+  button,
+  .pill-action,
+  .fixed,
+  .card-saas,
+  #root > div > header,
+  #root > div > aside {
+    display: none !important;
+  }
+
+  /* Force print sheets to look immaculate on standard A4 */
+  .a4-print-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 auto !important;
+    padding: 8mm 10mm !important;
+    width: 100% !important;
+    max-width: 210mm !important;
+    min-height: 290mm !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+  }
+
+  .a4-print-sheet:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0mm;
+  }
+}
+
+/* Modern CAD Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 rgba(15, 23, 42, 0.6);
+}
+
+/* Authentic HelioScope Royal Cobalt Blue Solar Module Styling */
+.helioscope-solar-wafer {
+  fill: #3b49df !important;
+  fill-opacity: 0.88 !important;
+  stroke: #e0e7ff !important;
+  stroke-width: 1px !important;
+  transition: stroke 0.15s ease, fill 0.15s ease;
+}
+.helioscope-solar-wafer:hover {
+  fill: #4f46e5 !important;
+  stroke: #ffffff !important;
+  stroke-width: 1.5px !important;
+  filter: drop-shadow(0 0 6px rgba(79, 70, 229, 0.8));
+}
+

@@ -1,0 +1,2221 @@
+{
+  "projects": [
+    {
+      "id": "111b9877-661e-4b75-9202-a01ebf22c7af",
+      "projectCode": "SLR-PK-2026-4233",
+      "clientName": "nouman khan",
+      "clientCnic": "372518264993",
+      "siteAddress": "house no 19, street 6 , sector A bahria phase 7 rwp",
+      "subDivision": "bahria divison",
+      "latitude": 33.506835,
+      "longitude": 73.076776,
+      "systemCapacityKw": 15,
+      "contractPricePkr": 1350000,
+      "estimatedCostPkr": 1000000,
+      "netProfitPkr": 350000,
+      "dealCloseDate": "2026-09-16T11:26:17.295Z",
+      "targetDeliveryDate": "2026-12-10T00:00:00.000Z",
+      "projectDetails": "high beem structure because of the trees",
+      "status": "ONBOARDED",
+      "createdAt": "2026-09-16T11:26:17.307Z",
+      "updatedAt": "2026-09-16T11:26:17.307Z",
+      "surveyUploadedAt": null,
+      "boqSubmittedAt": null,
+      "adminApprovedAt": null,
+      "siteCompletedAt": null,
+      "completionYear": null,
+      "createdBy": "usr-super-admin-001",
+      "approvedBy": null,
+      "financialModel": {
+        "gridTariffPkr": 55,
+        "tariffEscalationPct": 8,
+        "degradationPct": 0.5,
+        "discountRatePct": 12,
+        "investmentPkr": 1350000,
+        "capacityKw": 15,
+        "updatedAt": "2026-09-16T11:26:17.306Z"
+      }
+    },
+    {
+      "id": "ad8d8789-55fd-42e9-a6f0-aed091423c13",
+      "projectCode": "SLR-PK-2026-1546",
+      "clientName": "ali hamza",
+      "clientCnic": "3512971523593",
+      "siteAddress": "house no 10 ,street 10 downtown dha 2 islamabad",
+      "subDivision": "dha divsion",
+      "latitude": 33.523243,
+      "longitude": 73.149225,
+      "systemCapacityKw": 10,
+      "contractPricePkr": 1150000,
+      "estimatedCostPkr": 950000,
+      "netProfitPkr": 200000,
+      "dealCloseDate": "2026-09-15T22:32:00.000Z",
+      "targetDeliveryDate": "2026-10-10T00:00:00.000Z",
+      "projectDetails": "civil work must be solid due to strong winds",
+      "status": "ONBOARDED",
+      "createdAt": "2026-09-16T08:42:40.089Z",
+      "updatedAt": "2026-09-16T11:37:05.796Z",
+      "surveyUploadedAt": "2026-09-16T08:43:52.388Z",
+      "boqSubmittedAt": null,
+      "adminApprovedAt": null,
+      "siteCompletedAt": null,
+      "completionYear": null,
+      "createdBy": "usr-super-admin-001",
+      "approvedBy": null,
+      "financialModel": {
+        "gridTariffPkr": 55,
+        "tariffEscalationPct": 8,
+        "degradationPct": 0.5,
+        "discountRatePct": 12,
+        "investmentPkr": 1150000,
+        "capacityKw": 15,
+        "updatedAt": "2026-09-16T08:42:40.088Z"
+      }
+    }
+  ],
+  "siteSurveys": [
+    {
+      "id": "4f014615-e817-4fc4-844c-4b483a0d2103",
+      "projectId": "ad8d8789-55fd-42e9-a6f0-aed091423c13",
+      "panelBrand": "Jinko Solar",
+      "panelModel": "Tiger Neo 585W Dual-Glass",
+      "panelWattage": 585,
+      "panelQuantity": 257,
+      "inverterType": "On-Grid",
+      "inverterBrand": "Huawei",
+      "inverterCapacityKw": 100,
+      "structureType": "L2 Elevated",
+      "frontHeightMm": 450,
+      "backHeightMm": 1850,
+      "tiltAngle": 18,
+      "azimuthDirection": "True South (180°)",
+      "batteryType": "None / Grid-Tied Only",
+      "batteryBrand": "Huawei LUNA2000",
+      "cableBrand": "Fast Cables",
+      "cableSize": "1x6mm² DC Solar XLPO",
+      "cableLengthMeters": 120,
+      "earthingJobPrice": 120000,
+      "civilWorkPrice": 85000,
+      "installationPrice": 135000,
+      "netMeteringPrice": 75000,
+      "includeSld": true,
+      "roofPolygonJson": [],
+      "aiSummaryText": "Engineering site audit for ali hamza (SLR-PK-2026-1546) validates a 150.345 kWp commercial grid-tied PV installation. The array configuration incorporates high-efficiency Jinko Solar Tiger Neo 585W Dual-Glass modules paired with Huawei industrial On-Grid inverters mounted on L2 Elevated racking at a 18° tilt. Total turnkey client contract value is strictly indexed at PKR 16,500,000 with a projected simple capital payback of 2.4 years. Balance-of-system includes Fast Cables low-loss cabling, dedicated chemical earthing pit, and compliant DISCO net-metering synchronization ready for instant 1-click executive seal."
+    }
+  ],
+  "quotations": [],
+  "auditLogs": [
+    {
+      "id": "aud-1791723300449-d8ox",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Sunday",
+      "date": "11-Oct-2026",
+      "dateWithDay": "Sunday, 11-Oct-2026",
+      "time": "05:55:00 PM (PKT)",
+      "pktTimestamp": "Sunday, 11-Oct-2026 | 05:55:00 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-10-11T12:55:00.448Z",
+      "ipAddress": "::1",
+      "signatureHash": "d103f949541dfce9a1f5fcf228632ea0158425a9e70f0dca9bd15b330f338a8e",
+      "details": {
+        "sessionId": "a608eee7-c4b8-48bd-a8be-73e74ea7c3d2",
+        "loginTimestamp": "2026-10-11T12:55:00.448Z"
+      }
+    },
+    {
+      "id": "aud-1791723300402-byah",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Sunday",
+      "date": "11-Oct-2026",
+      "dateWithDay": "Sunday, 11-Oct-2026",
+      "time": "05:55:00 PM (PKT)",
+      "pktTimestamp": "Sunday, 11-Oct-2026 | 05:55:00 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-10-11T12:55:00.401Z",
+      "ipAddress": "::1",
+      "signatureHash": "1e3edd3e0b09857456a194371cf8aea62cedf3980fc77c687c732795bd2591db",
+      "details": {
+        "sessionId": "0be9204a-5f10-4bd2-8522-75bd3d2dd0d3",
+        "loginTimestamp": "2026-10-11T12:55:00.401Z"
+      }
+    },
+    {
+      "id": "aud-1790498518370-lb28",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Sunday",
+      "date": "27-Sep-2026",
+      "dateWithDay": "Sunday, 27-Sep-2026",
+      "time": "01:41:58 PM (PKT)",
+      "pktTimestamp": "Sunday, 27-Sep-2026 | 01:41:58 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-27T08:41:58.370Z",
+      "ipAddress": "::1",
+      "signatureHash": "db0683064a4fd56ba1cddd755931ba163dac4b488bf434b9772d9ba572de1b7f",
+      "details": {
+        "sessionId": "f184558a-ecc7-4b02-ab0a-19726d2a7f02",
+        "loginTimestamp": "2026-09-27T08:41:58.370Z"
+      }
+    },
+    {
+      "id": "aud-1790224721702-q85f",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Thursday",
+      "date": "24-Sep-2026",
+      "dateWithDay": "Thursday, 24-Sep-2026",
+      "time": "09:38:41 AM (PKT)",
+      "pktTimestamp": "Thursday, 24-Sep-2026 | 09:38:41 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-24T04:38:41.701Z",
+      "ipAddress": "::1",
+      "signatureHash": "e9815bf1b9483cb63bceaeb3a3dde72633ba21855b2f34d4e0c55c078cf94a8b",
+      "details": {
+        "sessionId": "2cf0e8c1-3638-48d0-9e7a-ecd6cea079ba",
+        "loginTimestamp": "2026-09-24T04:38:41.701Z"
+      }
+    },
+    {
+      "id": "aud-1790224721585-i81r",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Thursday",
+      "date": "24-Sep-2026",
+      "dateWithDay": "Thursday, 24-Sep-2026",
+      "time": "09:38:41 AM (PKT)",
+      "pktTimestamp": "Thursday, 24-Sep-2026 | 09:38:41 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-24T04:38:41.585Z",
+      "ipAddress": "::1",
+      "signatureHash": "3f049439570f9e92cfb0d4cbfcae8a51279a4a39c916b15e5b3542de70b358c6",
+      "details": {
+        "sessionId": "30f2e35c-8e26-4f3a-9f2a-1e3bfdd601a1",
+        "loginTimestamp": "2026-09-24T04:38:41.582Z"
+      }
+    },
+    {
+      "id": "aud-1790080274771-upt6",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Tuesday",
+      "date": "22-Sep-2026",
+      "dateWithDay": "Tuesday, 22-Sep-2026",
+      "time": "05:31:14 PM (PKT)",
+      "pktTimestamp": "Tuesday, 22-Sep-2026 | 05:31:14 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-22T12:31:14.771Z",
+      "ipAddress": "::1",
+      "signatureHash": "da5ad3f042525fe0f927745c48a2f6fd704e9b6225ed2053dd3bac6d36b3b0c4",
+      "details": {
+        "sessionId": "10bf3e29-dcfd-44c8-873f-0a0e4a4c5d14",
+        "loginTimestamp": "2026-09-22T12:31:14.716Z"
+      }
+    },
+    {
+      "id": "aud-1789965454703-hs6r",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Monday",
+      "date": "21-Sep-2026",
+      "dateWithDay": "Monday, 21-Sep-2026",
+      "time": "09:37:34 AM (PKT)",
+      "pktTimestamp": "Monday, 21-Sep-2026 | 09:37:34 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-21T04:37:34.703Z",
+      "ipAddress": "::1",
+      "signatureHash": "15b61525ee6c3cb823845f3a24953c409821ed22eb72dfa131ff3bcbcc81d96c",
+      "details": {
+        "sessionId": "16d70157-8d25-426d-8684-42c965f85d97",
+        "loginTimestamp": "2026-09-21T04:37:34.702Z"
+      }
+    },
+    {
+      "id": "aud-1789965454697-68vw",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Monday",
+      "date": "21-Sep-2026",
+      "dateWithDay": "Monday, 21-Sep-2026",
+      "time": "09:37:34 AM (PKT)",
+      "pktTimestamp": "Monday, 21-Sep-2026 | 09:37:34 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-21T04:37:34.696Z",
+      "ipAddress": "::1",
+      "signatureHash": "1994dcb5178337c1174e4220ab37552fe041226968879b199141b3185a0e5779",
+      "details": {
+        "sessionId": "69f45e31-148b-46a1-b490-d5e5a11bba49",
+        "loginTimestamp": "2026-09-21T04:37:34.696Z"
+      }
+    },
+    {
+      "id": "aud-1789893121375-8wy0",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Sunday",
+      "date": "20-Sep-2026",
+      "dateWithDay": "Sunday, 20-Sep-2026",
+      "time": "01:32:01 PM (PKT)",
+      "pktTimestamp": "Sunday, 20-Sep-2026 | 01:32:01 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-20T08:32:01.375Z",
+      "ipAddress": "::1",
+      "signatureHash": "df7e20a7d71718f8a077f322b72425252a1c48e3a37b890b54a1f56621f89590",
+      "details": {
+        "sessionId": "105a4ffa-178e-4c60-ba10-bff69258b211",
+        "loginTimestamp": "2026-09-20T08:32:01.375Z"
+      }
+    },
+    {
+      "id": "aud-1789851470028-fsf2",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Sunday",
+      "date": "20-Sep-2026",
+      "dateWithDay": "Sunday, 20-Sep-2026",
+      "time": "01:57:50 AM (PKT)",
+      "pktTimestamp": "Sunday, 20-Sep-2026 | 01:57:50 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-19T20:57:50.027Z",
+      "ipAddress": "::1",
+      "signatureHash": "874f141866d0542aae478ce443f51eeeb3220a3d3d02da1effd670fd4d56231d",
+      "details": {
+        "sessionId": "be1cfdab-d907-444b-a5c6-0b84fcb481ad",
+        "loginTimestamp": "2026-09-19T20:57:50.027Z"
+      }
+    },
+    {
+      "id": "aud-1789800951865-687i",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Saturday",
+      "date": "19-Sep-2026",
+      "dateWithDay": "Saturday, 19-Sep-2026",
+      "time": "11:55:51 AM (PKT)",
+      "pktTimestamp": "Saturday, 19-Sep-2026 | 11:55:51 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-19T06:55:51.864Z",
+      "ipAddress": "::1",
+      "signatureHash": "e350cdb936fbc1ec8809e1685cc39e8e81e9a688da5205f3f2e9dbb9f6ded7e4",
+      "details": {
+        "sessionId": "35c0cd3a-c84d-4ad1-9d3b-270c343be9f5",
+        "loginTimestamp": "2026-09-19T06:55:51.864Z"
+      }
+    },
+    {
+      "id": "aud-1789759837135-oxq2",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Saturday",
+      "date": "19-Sep-2026",
+      "dateWithDay": "Saturday, 19-Sep-2026",
+      "time": "12:30:37 AM (PKT)",
+      "pktTimestamp": "Saturday, 19-Sep-2026 | 12:30:37 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-18T19:30:37.135Z",
+      "ipAddress": "::1",
+      "signatureHash": "be1123c3ebde181add9135f4adaaf4780feef41e7e57a9fc6f0daebe200beac8",
+      "details": {
+        "sessionId": "e1b2cdfe-1e63-40e1-9c25-726fa53914a0",
+        "loginTimestamp": "2026-09-18T19:30:37.135Z"
+      }
+    },
+    {
+      "id": "aud-1789707821456-6bht",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Friday",
+      "date": "18-Sep-2026",
+      "dateWithDay": "Friday, 18-Sep-2026",
+      "time": "10:03:41 AM (PKT)",
+      "pktTimestamp": "Friday, 18-Sep-2026 | 10:03:41 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-18T05:03:41.455Z",
+      "ipAddress": "::1",
+      "signatureHash": "3c516ed550e7b19eb485d80c8efd38dac696e8286e77cb8d28e6ce7d1138c5c0",
+      "details": {
+        "sessionId": "dd90e816-df2d-4c7d-a752-d661bd720808",
+        "loginTimestamp": "2026-09-18T05:03:41.455Z"
+      }
+    },
+    {
+      "id": "aud-1789622860870-kvdm",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Thursday",
+      "date": "17-Sep-2026",
+      "dateWithDay": "Thursday, 17-Sep-2026",
+      "time": "10:27:40 AM (PKT)",
+      "pktTimestamp": "Thursday, 17-Sep-2026 | 10:27:40 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-17T05:27:40.869Z",
+      "ipAddress": "::1",
+      "signatureHash": "63d30c97c8258d84545e335cf3601e6d377c8b996b0b583159c6354ffb2e8e27",
+      "details": {
+        "sessionId": "c800e3bb-25ef-4934-b7ca-7ef02cf44515",
+        "loginTimestamp": "2026-09-17T05:27:40.869Z"
+      }
+    },
+    {
+      "id": "aud-1789622860846-od3x",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Thursday",
+      "date": "17-Sep-2026",
+      "dateWithDay": "Thursday, 17-Sep-2026",
+      "time": "10:27:40 AM (PKT)",
+      "pktTimestamp": "Thursday, 17-Sep-2026 | 10:27:40 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-17T05:27:40.846Z",
+      "ipAddress": "::1",
+      "signatureHash": "0942d468e21ee874b48768fbceb76399f57b13c0723bf294cf229ee902dd96cb",
+      "details": {
+        "sessionId": "210a878a-db75-42d5-859d-39537cf9380a",
+        "loginTimestamp": "2026-09-17T05:27:40.845Z"
+      }
+    },
+    {
+      "id": "aud-1789558625801-mrxc",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROJECT_UPDATED",
+      "dayOfWeek": "Wednesday",
+      "date": "16-Sep-2026",
+      "dateWithDay": "Wednesday, 16-Sep-2026",
+      "time": "04:37:05 PM (PKT)",
+      "pktTimestamp": "Wednesday, 16-Sep-2026 | 04:37:05 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-16T11:37:05.800Z",
+      "ipAddress": "::1",
+      "signatureHash": "39503eb57123b9edc04a1ba1761938c3c89cd334854235ad672bebc578f7e598",
+      "details": {
+        "projectId": "ad8d8789-55fd-42e9-a6f0-aed091423c13",
+        "projectCode": "SLR-PK-2026-1546",
+        "clientName": "ali hamza",
+        "systemCapacityKw": 10
+      }
+    },
+    {
+      "id": "aud-1789558606888-mask",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROJECT_UPDATED",
+      "dayOfWeek": "Wednesday",
+      "date": "16-Sep-2026",
+      "dateWithDay": "Wednesday, 16-Sep-2026",
+      "time": "04:36:46 PM (PKT)",
+      "pktTimestamp": "Wednesday, 16-Sep-2026 | 04:36:46 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-16T11:36:46.888Z",
+      "ipAddress": "::1",
+      "signatureHash": "1b50868f59fa9c468491331b01150ca2885dc53491594362c5007ce772649f0f",
+      "details": {
+        "projectId": "ad8d8789-55fd-42e9-a6f0-aed091423c13",
+        "projectCode": "SLR-PK-2026-1546",
+        "clientName": "ali hamza",
+        "systemCapacityKw": 15
+      }
+    },
+    {
+      "id": "aud-1789557977313-ifid",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROJECT_CREATED",
+      "dayOfWeek": "Wednesday",
+      "date": "16-Sep-2026",
+      "dateWithDay": "Wednesday, 16-Sep-2026",
+      "time": "04:26:17 PM (PKT)",
+      "pktTimestamp": "Wednesday, 16-Sep-2026 | 04:26:17 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-16T11:26:17.313Z",
+      "ipAddress": "::1",
+      "signatureHash": "105c5b2a01110a12d1563d656646e7e316b66b7b5c576570b80fc39055bf07d4",
+      "details": {
+        "projectId": "111b9877-661e-4b75-9202-a01ebf22c7af",
+        "projectCode": "SLR-PK-2026-4233",
+        "clientName": "nouman khan",
+        "clientCnic": "372518264993",
+        "subDivision": "bahria divison",
+        "systemCapacityKw": 15,
+        "contractPricePkr": 1350000,
+        "estimatedCostPkr": 1000000,
+        "netProfitPkr": 350000
+      }
+    },
+    {
+      "id": "aud-1789548232390-e6tf",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "SITE_SURVEY_RECORDED",
+      "dayOfWeek": "Wednesday",
+      "date": "16-Sep-2026",
+      "dateWithDay": "Wednesday, 16-Sep-2026",
+      "time": "01:43:52 PM (PKT)",
+      "pktTimestamp": "Wednesday, 16-Sep-2026 | 01:43:52 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-16T08:43:52.390Z",
+      "ipAddress": "::1",
+      "signatureHash": "f25a5b9f5d99cef7e1548f656dbcc2bca378995dfeb102d12906da93b606e117",
+      "details": {
+        "projectId": "ad8d8789-55fd-42e9-a6f0-aed091423c13",
+        "panelWattage": 585,
+        "panelQuantity": 257,
+        "structureType": "L2 Elevated"
+      }
+    },
+    {
+      "id": "aud-1789548160091-igf0",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROJECT_CREATED",
+      "dayOfWeek": "Wednesday",
+      "date": "16-Sep-2026",
+      "dateWithDay": "Wednesday, 16-Sep-2026",
+      "time": "01:42:40 PM (PKT)",
+      "pktTimestamp": "Wednesday, 16-Sep-2026 | 01:42:40 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-16T08:42:40.091Z",
+      "ipAddress": "::1",
+      "signatureHash": "2d8b6e6c069aaf7d91d741863fc94ee558effde201e5503847314b9352f8acc2",
+      "details": {
+        "projectId": "ad8d8789-55fd-42e9-a6f0-aed091423c13",
+        "projectCode": "SLR-PK-2026-1546",
+        "clientName": "ali hamza",
+        "clientCnic": "3512971523593",
+        "subDivision": "dha divsion",
+        "systemCapacityKw": 15,
+        "contractPricePkr": 1150000,
+        "estimatedCostPkr": 950000,
+        "netProfitPkr": 200000
+      }
+    },
+    {
+      "id": "aud-1789534286666-jnyh",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Wednesday",
+      "date": "16-Sep-2026",
+      "dateWithDay": "Wednesday, 16-Sep-2026",
+      "time": "09:51:26 AM (PKT)",
+      "pktTimestamp": "Wednesday, 16-Sep-2026 | 09:51:26 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-16T04:51:26.665Z",
+      "ipAddress": "::1",
+      "signatureHash": "91858599db87965d7114cbd333d5fd75ac2518c291b2a90f648d1b7ed529089e",
+      "details": {
+        "sessionId": "7d449576-d4d1-4452-88f1-ed03e87b776f",
+        "loginTimestamp": "2026-09-16T04:51:26.665Z"
+      }
+    },
+    {
+      "id": "aud-1789484333245-whvp",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Tuesday",
+      "date": "15-Sep-2026",
+      "dateWithDay": "Tuesday, 15-Sep-2026",
+      "time": "07:58:53 PM (PKT)",
+      "pktTimestamp": "Tuesday, 15-Sep-2026 | 07:58:53 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-15T14:58:53.245Z",
+      "ipAddress": "::1",
+      "signatureHash": "3f78f15a497f27b6696e0f54435758b604c7691ef6d424ae82740a0ec3699223",
+      "details": {
+        "sessionId": "a8a5ab59-b1ed-4be0-b3a9-91f5bb4bf7b0",
+        "loginTimestamp": "2026-09-15T14:58:53.243Z"
+      }
+    },
+    {
+      "id": "aud-1789484327775-cpti",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGOUT",
+      "dayOfWeek": "Tuesday",
+      "date": "15-Sep-2026",
+      "dateWithDay": "Tuesday, 15-Sep-2026",
+      "time": "07:58:47 PM (PKT)",
+      "pktTimestamp": "Tuesday, 15-Sep-2026 | 07:58:47 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-15T14:58:47.775Z",
+      "ipAddress": "::1",
+      "signatureHash": "53441e168f580721b1360339f22b4ca17879b91a3557b83bce1f3043ae746c8f",
+      "details": {
+        "durationMinutes": 0
+      }
+    },
+    {
+      "id": "aud-1789484271306-xfub",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "ADMIN_USER_DEACTIVATED",
+      "dayOfWeek": "Tuesday",
+      "date": "15-Sep-2026",
+      "dateWithDay": "Tuesday, 15-Sep-2026",
+      "time": "07:57:51 PM (PKT)",
+      "pktTimestamp": "Tuesday, 15-Sep-2026 | 07:57:51 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-15T14:57:51.305Z",
+      "ipAddress": "::1",
+      "signatureHash": "6212b4f731ae4a425a1120040c7543955872e3ad9522535883d4267f24a280f6",
+      "details": {
+        "targetUserId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+        "targetEmail": "tariq@greentech.pk",
+        "targetRole": "SURVEY_ENGINEER"
+      }
+    },
+    {
+      "id": "aud-1789483963755-il0y",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "MOCK_DATA_CLEARED",
+      "dayOfWeek": "Tuesday",
+      "date": "15-Sep-2026",
+      "dateWithDay": "Tuesday, 15-Sep-2026",
+      "time": "07:52:43 PM (PKT)",
+      "pktTimestamp": "Tuesday, 15-Sep-2026 | 07:52:43 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-15T14:52:43.754Z",
+      "ipAddress": "::1",
+      "signatureHash": "2732adae4b2a08b3fff35822e53f88167680d5d87a5e7c3a80e8dcfe8160bf2c",
+      "details": {
+        "notes": "Admin / Warehouse Keeper purged all dummy AI inventory data. Real zero stock slate established."
+      }
+    },
+    {
+      "id": "aud-1789483931024-zwfn",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "COPILOT_QUERY_EXECUTED",
+      "dayOfWeek": "Tuesday",
+      "date": "15-Sep-2026",
+      "dateWithDay": "Tuesday, 15-Sep-2026",
+      "time": "07:52:11 PM (PKT)",
+      "pktTimestamp": "Tuesday, 15-Sep-2026 | 07:52:11 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-15T14:52:11.023Z",
+      "ipAddress": "::1",
+      "signatureHash": "acfaa623087a1522fa1502749f07a4abca1849e1a46497cd66ebeb8ec5526cfe",
+      "details": {
+        "query": "Total kWp in ERP"
+      }
+    },
+    {
+      "id": "aud-1789483927582-pi8b",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "COPILOT_QUERY_EXECUTED",
+      "dayOfWeek": "Tuesday",
+      "date": "15-Sep-2026",
+      "dateWithDay": "Tuesday, 15-Sep-2026",
+      "time": "07:52:07 PM (PKT)",
+      "pktTimestamp": "Tuesday, 15-Sep-2026 | 07:52:07 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-15T14:52:07.581Z",
+      "ipAddress": "::1",
+      "signatureHash": "1a15aef2ff24e2bcc3bf9fa0a8f56ea3998e4675b9977490b8943dd10d84630f",
+      "details": {
+        "query": "Summarize Active Project"
+      }
+    },
+    {
+      "id": "aud-1789453197785-oxp0",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Tuesday",
+      "date": "15-Sep-2026",
+      "dateWithDay": "Tuesday, 15-Sep-2026",
+      "time": "11:19:57 AM (PKT)",
+      "pktTimestamp": "Tuesday, 15-Sep-2026 | 11:19:57 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-15T06:19:57.785Z",
+      "ipAddress": "::1",
+      "signatureHash": "95fae491275202390cbf482d308cc4aa12a1dea360ce0e09afbd2744c13b4c92",
+      "details": {
+        "sessionId": "c32b263e-c975-43a6-80eb-d3d4d4d7c113",
+        "loginTimestamp": "2026-09-15T06:19:57.785Z"
+      }
+    },
+    {
+      "id": "aud-1789453197630-uqmz",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Tuesday",
+      "date": "15-Sep-2026",
+      "dateWithDay": "Tuesday, 15-Sep-2026",
+      "time": "11:19:57 AM (PKT)",
+      "pktTimestamp": "Tuesday, 15-Sep-2026 | 11:19:57 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-15T06:19:57.630Z",
+      "ipAddress": "::1",
+      "signatureHash": "43688c1f3c5198c6abff6a6e3e0536fe9f0005548272a662a02952fbb66248d5",
+      "details": {
+        "sessionId": "43d98a78-655e-4683-9526-7fc403863d36",
+        "loginTimestamp": "2026-09-15T06:19:57.630Z"
+      }
+    },
+    {
+      "id": "aud-1789448797031-lc7u",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Tuesday",
+      "date": "15-Sep-2026",
+      "dateWithDay": "Tuesday, 15-Sep-2026",
+      "time": "10:06:37 AM (PKT)",
+      "pktTimestamp": "Tuesday, 15-Sep-2026 | 10:06:37 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-15T05:06:37.031Z",
+      "ipAddress": "::1",
+      "signatureHash": "f8e6c80ee3bb435652723425f1d0d0de3c78c4f4d412f9253b0f0650c08c7922",
+      "details": {
+        "sessionId": "de4cfd32-dd3b-4378-935d-dd63e5a8f8f6",
+        "loginTimestamp": "2026-09-15T05:06:37.031Z"
+      }
+    },
+    {
+      "id": "aud-1789376903771-eb9q",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Monday",
+      "date": "14-Sep-2026",
+      "dateWithDay": "Monday, 14-Sep-2026",
+      "time": "02:08:23 PM (PKT)",
+      "pktTimestamp": "Monday, 14-Sep-2026 | 02:08:23 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T09:08:23.771Z",
+      "ipAddress": "::1",
+      "signatureHash": "9a9dda7bfb01de09e80efb411bdcc90d76033a0ed998bd9a24c592cf3130de3b",
+      "details": {
+        "sessionId": "3221470e-223d-4be4-8eb8-f1fe60de6d0d",
+        "loginTimestamp": "2026-09-14T09:08:23.770Z"
+      }
+    },
+    {
+      "id": "aud-1789376745689-fae0",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGOUT",
+      "dayOfWeek": "Monday",
+      "date": "14-Sep-2026",
+      "dateWithDay": "Monday, 14-Sep-2026",
+      "time": "02:05:45 PM (PKT)",
+      "pktTimestamp": "Monday, 14-Sep-2026 | 02:05:45 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T09:05:45.688Z",
+      "ipAddress": "::1",
+      "signatureHash": "fd95dd3d0454bbe7dfd28658a25571f41168580d380b9628d47f00a852a1022b",
+      "details": {
+        "durationMinutes": 0
+      }
+    },
+    {
+      "id": "aud-1789367577470-u7px",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROJECT_DELETED",
+      "dayOfWeek": "Monday",
+      "date": "14-Sep-2026",
+      "dateWithDay": "Monday, 14-Sep-2026",
+      "time": "11:32:57 AM (PKT)",
+      "pktTimestamp": "Monday, 14-Sep-2026 | 11:32:57 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T06:32:57.469Z",
+      "ipAddress": "::1",
+      "signatureHash": "4d7a7e5688a727979082ca7e3a245b0220fd22a70847107ecb1ae92931976b2e",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan"
+      }
+    },
+    {
+      "id": "aud-1789367436103-49ri",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Monday",
+      "date": "14-Sep-2026",
+      "dateWithDay": "Monday, 14-Sep-2026",
+      "time": "11:30:36 AM (PKT)",
+      "pktTimestamp": "Monday, 14-Sep-2026 | 11:30:36 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T06:30:36.103Z",
+      "ipAddress": "::1",
+      "signatureHash": "9dcc88a2c2bd0353554ac30fd9e91c49b9b69282e4fc8babca6fd02f4b9f85d3",
+      "details": {
+        "sessionId": "3d0e31da-9e81-423e-8608-72abfad28e1a",
+        "loginTimestamp": "2026-09-14T06:30:36.102Z"
+      }
+    },
+    {
+      "id": "aud-1789365382848-gjif",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Monday",
+      "date": "14-Sep-2026",
+      "dateWithDay": "Monday, 14-Sep-2026",
+      "time": "10:56:22 AM (PKT)",
+      "pktTimestamp": "Monday, 14-Sep-2026 | 10:56:22 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T05:56:22.847Z",
+      "ipAddress": "::1",
+      "signatureHash": "cae9d7ad4a35dcdaf99128aaaf9b1f7953818d6381fc042cf801254c957bd7b6",
+      "details": {
+        "sessionId": "e6539510-65d9-44d6-80d5-32e606027605",
+        "loginTimestamp": "2026-09-14T05:56:22.846Z"
+      }
+    },
+    {
+      "id": "aud-1789365285775-4i56",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Monday",
+      "date": "14-Sep-2026",
+      "dateWithDay": "Monday, 14-Sep-2026",
+      "time": "10:54:45 AM (PKT)",
+      "pktTimestamp": "Monday, 14-Sep-2026 | 10:54:45 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T05:54:45.774Z",
+      "ipAddress": "::1",
+      "signatureHash": "912c6a188e8454fa05e6f80ca0c79ffc8be74322576ec0e0c0c186861fbe00be",
+      "details": {
+        "sessionId": "9e19c027-225d-44b4-8fb7-5ebd7d7b67ca",
+        "loginTimestamp": "2026-09-14T05:54:45.774Z"
+      }
+    },
+    {
+      "id": "aud-1789365268448-kzln",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "FINANCIAL_MODEL_SYNCHRONIZED",
+      "dayOfWeek": "Monday",
+      "date": "14-Sep-2026",
+      "dateWithDay": "Monday, 14-Sep-2026",
+      "time": "10:54:28 AM (PKT)",
+      "pktTimestamp": "Monday, 14-Sep-2026 | 10:54:28 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T05:54:28.448Z",
+      "ipAddress": "::1",
+      "signatureHash": "4c0057cbf42584c41f5eea41805dce2ac3000b2f454f0f19068ddbf766752835",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "capacityKw": 10,
+        "gridTariffPkr": 58.5,
+        "paybackDisplay": "3.1 Years",
+        "firstYearSavingsPkr": 924300
+      }
+    },
+    {
+      "id": "aud-1789365268382-put4",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Monday",
+      "date": "14-Sep-2026",
+      "dateWithDay": "Monday, 14-Sep-2026",
+      "time": "10:54:28 AM (PKT)",
+      "pktTimestamp": "Monday, 14-Sep-2026 | 10:54:28 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T05:54:28.382Z",
+      "ipAddress": "::1",
+      "signatureHash": "00a1b524b498536a30c0bc5c89f4695adac13315aac92794cfbd85e9f950a56a",
+      "details": {
+        "sessionId": "d019bda6-ed0a-435d-a31a-6a348fac30d8",
+        "loginTimestamp": "2026-09-14T05:54:28.381Z"
+      }
+    },
+    {
+      "id": "aud-1789364844004-jfxg",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROJECT_UPDATED",
+      "dayOfWeek": "Monday",
+      "date": "14-Sep-2026",
+      "dateWithDay": "Monday, 14-Sep-2026",
+      "time": "10:47:24 AM (PKT)",
+      "pktTimestamp": "Monday, 14-Sep-2026 | 10:47:24 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T05:47:24.004Z",
+      "ipAddress": "::1",
+      "signatureHash": "75d6fdfbcdab81a63d59186a7a0f2b11bf9a6b3affb941e38eb83fcc597ab4a8",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "systemCapacityKw": 10
+      }
+    },
+    {
+      "id": "aud-1789364843913-trn5",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Monday",
+      "date": "14-Sep-2026",
+      "dateWithDay": "Monday, 14-Sep-2026",
+      "time": "10:47:23 AM (PKT)",
+      "pktTimestamp": "Monday, 14-Sep-2026 | 10:47:23 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T05:47:23.912Z",
+      "ipAddress": "::1",
+      "signatureHash": "83aa10bf796f14bed97b9d2c2d14dfde05bf8752462ba0d38f3480f12c43e7f6",
+      "details": {
+        "sessionId": "43c3481e-72bc-4692-b5a4-e726dfc8271a",
+        "loginTimestamp": "2026-09-14T05:47:23.911Z"
+      }
+    },
+    {
+      "id": "aud-1789364688718-3z6q",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROJECT_UPDATED",
+      "date": "14-Sep-2026",
+      "time": "10:44:48 AM (PKT)",
+      "pktTimestamp": "14-Sep-2026 | 10:44:48 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T05:44:48.717Z",
+      "ipAddress": "::1",
+      "signatureHash": "5834ef9fb6af4c56a3a3bb1d6d1b485e5279357aee20a7a15c74772cdd694c95",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "systemCapacityKw": 10
+      }
+    },
+    {
+      "id": "aud-1789364688628-9ghu",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "14-Sep-2026",
+      "time": "10:44:48 AM (PKT)",
+      "pktTimestamp": "14-Sep-2026 | 10:44:48 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T05:44:48.628Z",
+      "ipAddress": "::1",
+      "signatureHash": "ec1916eb1c1bdb926a31f23575aed0815ae6e14546c0a4f2b73afe749588c28b",
+      "details": {
+        "sessionId": "d25b6321-5c53-4a32-804d-0e21187cf666",
+        "loginTimestamp": "2026-09-14T05:44:48.627Z"
+      }
+    },
+    {
+      "id": "aud-1789364395955-m8bq",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROJECT_DELETED",
+      "date": "14-Sep-2026",
+      "time": "10:39:55 AM (PKT)",
+      "pktTimestamp": "14-Sep-2026 | 10:39:55 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T05:39:55.954Z",
+      "ipAddress": "::1",
+      "signatureHash": "7fd78a3f92a9bb37904f6ec62411ebc505acf5602d5de1bb1c1c885da18ec2c9",
+      "details": {
+        "projectId": "ba7a634b-babc-46ab-9d3f-6fed09c4a58d",
+        "projectCode": "SLR-PK-2026-6748",
+        "clientName": "salman khan"
+      }
+    },
+    {
+      "id": "aud-1789364101700-wyvh",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "14-Sep-2026",
+      "time": "10:35:01 AM (PKT)",
+      "pktTimestamp": "14-Sep-2026 | 10:35:01 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T05:35:01.700Z",
+      "ipAddress": "::1",
+      "signatureHash": "dd3e5829cdcf2198be6e0140bbfc0cc04ead60f9ab8f7662f6c5bba461c38876",
+      "details": {
+        "sessionId": "ec9c8bbd-209c-4820-9858-8bfbf04ed79e",
+        "loginTimestamp": "2026-09-14T05:35:01.699Z"
+      }
+    },
+    {
+      "id": "aud-1789364101605-hr90",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "14-Sep-2026",
+      "time": "10:35:01 AM (PKT)",
+      "pktTimestamp": "14-Sep-2026 | 10:35:01 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-14T05:35:01.605Z",
+      "ipAddress": "::1",
+      "signatureHash": "62199889463e47f508b2a31326523cb2a5c172b512ca92ce50cab8530814f5ce",
+      "details": {
+        "sessionId": "6efc9104-f005-4873-a9a0-d97e317a405c",
+        "loginTimestamp": "2026-09-14T05:35:01.603Z"
+      }
+    },
+    {
+      "id": "aud-1789126805909-1fs1",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROPOSAL_SEALED_AND_LOCKED",
+      "date": "11-Sep-2026",
+      "time": "04:40:05 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 04:40:05 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T11:40:05.908Z",
+      "ipAddress": "::1",
+      "signatureHash": "8aaddfb38e6ed482fcf2c375eb834f0e433f0b0d89a167ac075855b904d0e958",
+      "details": {
+        "projectId": "ba7a634b-babc-46ab-9d3f-6fed09c4a58d",
+        "projectCode": "SLR-PK-2026-6748",
+        "clientName": "salman khan",
+        "approvedAt": "2026-09-11T11:40:05.900Z",
+        "digitalSignature": "SEAL-EXEC-98533D96CED1",
+        "authorizedBy": "Super Admin (GreenTech)",
+        "authorityRole": "SUPER_ADMIN"
+      }
+    },
+    {
+      "id": "aud-1789126454366-gaiy",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROJECT_UPDATED",
+      "date": "11-Sep-2026",
+      "time": "04:34:14 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 04:34:14 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T11:34:14.366Z",
+      "ipAddress": "::1",
+      "signatureHash": "7dffe2ca4fad8fdcfb27575845e3c1f26a18c46a5037545902e3ed286251b2e9",
+      "details": {
+        "projectId": "ba7a634b-babc-46ab-9d3f-6fed09c4a58d",
+        "projectCode": "SLR-PK-2026-6748",
+        "clientName": "salman khan",
+        "systemCapacityKw": 10
+      }
+    },
+    {
+      "id": "aud-1789126454302-rvpl",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "04:34:14 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 04:34:14 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T11:34:14.302Z",
+      "ipAddress": "::1",
+      "signatureHash": "d0f6180834effbb09d09ee89049af71773de46744df3fadc0af0c28d9c819ac8",
+      "details": {
+        "sessionId": "61115f14-a020-4eed-ae86-34fc82df20e0",
+        "loginTimestamp": "2026-09-11T11:34:14.301Z"
+      }
+    },
+    {
+      "id": "aud-1789125994930-hy67",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "04:26:34 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 04:26:34 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T11:26:34.926Z",
+      "ipAddress": "::1",
+      "signatureHash": "ce172d43369a9de0553f319764ef475e7b9287c7d2edc3e1a85d49dd0826332d",
+      "details": {
+        "sessionId": "32f270fd-88d8-4c85-b2a2-ab184ad44a5f",
+        "loginTimestamp": "2026-09-11T11:26:34.926Z"
+      }
+    },
+    {
+      "id": "aud-1789125957854-tm83",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "04:25:57 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 04:25:57 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T11:25:57.854Z",
+      "ipAddress": "::1",
+      "signatureHash": "c136e89cb9dfe8d6f31cc4e9ab4fb35bd5823c54a7e5c1076c8a7fdbe519b717",
+      "details": {
+        "sessionId": "cdd89e61-873c-4a68-bfcd-5636bc407dfc",
+        "loginTimestamp": "2026-09-11T11:25:57.854Z"
+      }
+    },
+    {
+      "id": "aud-1789125517041-mfjg",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "04:18:37 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 04:18:37 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T11:18:37.040Z",
+      "ipAddress": "::1",
+      "signatureHash": "0fc52cac4d8a0ae8a0132ac03454a4bcc0a7ae8e7609df44d03c9a341ecd7a69",
+      "details": {
+        "sessionId": "688e1fcc-be14-4a01-b12f-53823d0a66ce",
+        "loginTimestamp": "2026-09-11T11:18:37.040Z"
+      }
+    },
+    {
+      "id": "aud-1789125434446-ajcf",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROJECT_CREATED",
+      "date": "11-Sep-2026",
+      "time": "04:17:14 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 04:17:14 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T11:17:14.446Z",
+      "ipAddress": "::1",
+      "signatureHash": "fb3ce5584d51bac963f97d180eb4f543b4dadc425c58079c85d98e839c67339f",
+      "details": {
+        "projectId": "ba7a634b-babc-46ab-9d3f-6fed09c4a58d",
+        "projectCode": "SLR-PK-2026-6748",
+        "clientName": "salman khan",
+        "clientCnic": "4276371368323",
+        "subDivision": "dha 2",
+        "systemCapacityKw": 10,
+        "contractPricePkr": 1150000,
+        "estimatedCostPkr": 900000,
+        "netProfitPkr": 250000
+      }
+    },
+    {
+      "id": "aud-1789125083549-8o3m",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROJECT_DELETED",
+      "date": "11-Sep-2026",
+      "time": "04:11:23 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 04:11:23 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T11:11:23.549Z",
+      "ipAddress": "::1",
+      "signatureHash": "f24d861046df91dd7265374cc16bf95e494f4ae13c65b742fe3efa317955d250",
+      "details": {
+        "projectId": "adfb5b25-e85f-4d42-adbd-80c30061abd3",
+        "projectCode": "SLR-PK-2026-7639",
+        "clientName": "Malik Usman Solar Project"
+      }
+    },
+    {
+      "id": "aud-1789125083508-zytn",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "04:11:23 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 04:11:23 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T11:11:23.508Z",
+      "ipAddress": "::1",
+      "signatureHash": "d6c244f5d07ce0ea70917fc397fa8b83c3acb1a631062a28a2c08ef3a7ed3bcb",
+      "details": {
+        "sessionId": "e59f99b4-ed4b-45db-aa38-d85b51136ee4",
+        "loginTimestamp": "2026-09-11T11:11:23.508Z"
+      }
+    },
+    {
+      "id": "aud-1789125016311-3sqd",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROJECT_CREATED",
+      "date": "11-Sep-2026",
+      "time": "04:10:16 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 04:10:16 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T11:10:16.311Z",
+      "ipAddress": "::1",
+      "signatureHash": "140f6032bad147d2be48d3001295bc604e3fb9ae8676dcdcccb4f599ff3641e3",
+      "details": {
+        "projectId": "adfb5b25-e85f-4d42-adbd-80c30061abd3",
+        "projectCode": "SLR-PK-2026-7639",
+        "clientName": "Malik Usman Solar Project",
+        "clientCnic": "37405-1234567-1",
+        "subDivision": "IESCO",
+        "systemCapacityKw": 10,
+        "contractPricePkr": 1250000,
+        "estimatedCostPkr": 980000,
+        "netProfitPkr": 270000
+      }
+    },
+    {
+      "id": "aud-1789125016252-0gyb",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "04:10:16 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 04:10:16 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T11:10:16.249Z",
+      "ipAddress": "::1",
+      "signatureHash": "0bedebf80e850c1c3d8ecb638724bf955eac464efa9e38fc8e2422521493f9c1",
+      "details": {
+        "sessionId": "575e71d3-4ba8-4fce-836f-25e1319cc8ae",
+        "loginTimestamp": "2026-09-11T11:10:16.248Z"
+      }
+    },
+    {
+      "id": "aud-1789124377129-xt3z",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "03:59:37 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:59:37 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:59:37.129Z",
+      "ipAddress": "::1",
+      "signatureHash": "ac83b63bc456fb563cacb4c3bd7770d707ffcd13db97d99fbe4dda9d83597448",
+      "details": {
+        "sessionId": "ee921433-c625-4471-8348-4a3dc5d995ef",
+        "loginTimestamp": "2026-09-11T10:59:37.129Z"
+      }
+    },
+    {
+      "id": "aud-1789124368435-kllx",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "SITE_INSTALLATION_COMPLETED",
+      "date": "11-Sep-2026",
+      "time": "03:59:28 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:59:28 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:59:28.434Z",
+      "ipAddress": "::1",
+      "signatureHash": "9c6765a0913bab0d3dab4a34e02391c06ff8868da78fb385f830e78a22fdfe5d",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "completionYear": 2026,
+        "siteCompletedAt": "2026-09-11T10:59:28.431Z"
+      }
+    },
+    {
+      "id": "aud-1789124368410-59yo",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROPOSAL_SEALED_AND_LOCKED",
+      "date": "11-Sep-2026",
+      "time": "03:59:28 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:59:28 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:59:28.410Z",
+      "ipAddress": "::1",
+      "signatureHash": "9f0a52da8cdcd51723d4144ba9605614f7bd0211a795f548d6a9d277376c929e",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "approvedAt": "2026-09-11T10:59:28.403Z",
+        "digitalSignature": "SEAL-EXEC-5F7709B1DE2D",
+        "authorizedBy": "Super Admin (GreenTech)",
+        "authorityRole": "SUPER_ADMIN"
+      }
+    },
+    {
+      "id": "aud-1789124368381-8e9z",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROPOSAL_UNLOCKED",
+      "date": "11-Sep-2026",
+      "time": "03:59:28 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:59:28 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:59:28.380Z",
+      "ipAddress": "::1",
+      "signatureHash": "5c1a0a324997235e15fb54b0f15f43e1015ae809045091ed6a43b3c82526cd3b",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "unlockedAt": "2026-09-11T10:59:28.380Z",
+        "authorizedBy": "Super Admin (GreenTech)",
+        "authorityRole": "SUPER_ADMIN"
+      }
+    },
+    {
+      "id": "aud-1789124368356-b4n6",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROPOSAL_SEALED_AND_LOCKED",
+      "date": "11-Sep-2026",
+      "time": "03:59:28 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:59:28 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:59:28.356Z",
+      "ipAddress": "::1",
+      "signatureHash": "ec3a1801e63379cb6d6daba87554c1c13aa2a32c3b08d500e8f36c0610fc0cfe",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "approvedAt": "2026-09-11T10:59:28.350Z",
+        "digitalSignature": "SEAL-EXEC-43E7FDB36584",
+        "authorizedBy": "Super Admin (GreenTech)",
+        "authorityRole": "SUPER_ADMIN"
+      }
+    },
+    {
+      "id": "aud-1789124368280-fscp",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "03:59:28 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:59:28 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:59:28.279Z",
+      "ipAddress": "::1",
+      "signatureHash": "f3f5062bb9c5476f54be361f006bdf6015f6f41feb3ca8ea4390ed0bcd13426d",
+      "details": {
+        "sessionId": "fb4d8a9a-19c5-4bab-919a-345f9cf106ec",
+        "loginTimestamp": "2026-09-11T10:59:28.277Z"
+      }
+    },
+    {
+      "id": "aud-1789124013274-1h2m",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "SITE_INSTALLATION_COMPLETED",
+      "date": "11-Sep-2026",
+      "time": "03:53:33 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:53:33 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:53:33.274Z",
+      "ipAddress": "::1",
+      "signatureHash": "3c2bc092ab7015bea85a546f256addf4c586b582f359128e3ea148f1309ecd17",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "completionYear": 2026,
+        "siteCompletedAt": "2026-09-11T10:53:33.271Z"
+      }
+    },
+    {
+      "id": "aud-1789124013256-v3ad",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROPOSAL_SEALED_AND_LOCKED",
+      "date": "11-Sep-2026",
+      "time": "03:53:33 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:53:33 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:53:33.256Z",
+      "ipAddress": "::1",
+      "signatureHash": "c0d5e041fddaf7124f7834f3d2d13e25d82f203e06b361bb1918c324396755f4",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "approvedAt": "2026-09-11T10:53:33.250Z",
+        "digitalSignature": "SEAL-EXEC-935191E4CBAA",
+        "authorizedBy": "Super Admin (GreenTech)",
+        "authorityRole": "SUPER_ADMIN"
+      }
+    },
+    {
+      "id": "aud-1789124013233-wlhi",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROPOSAL_UNLOCKED",
+      "date": "11-Sep-2026",
+      "time": "03:53:33 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:53:33 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:53:33.233Z",
+      "ipAddress": "::1",
+      "signatureHash": "88918104ca49eb9f5cf1b215be56735b26c97b3122e06b27a70c415e3d52f522",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "unlockedAt": "2026-09-11T10:53:33.233Z",
+        "authorizedBy": "Super Admin (GreenTech)",
+        "authorityRole": "SUPER_ADMIN"
+      }
+    },
+    {
+      "id": "aud-1789124013209-5c1f",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROPOSAL_SEALED_AND_LOCKED",
+      "date": "11-Sep-2026",
+      "time": "03:53:33 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:53:33 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:53:33.209Z",
+      "ipAddress": "::1",
+      "signatureHash": "86a0208cc8549590264ae315ad27fb79b618ef9ae32f5476f299abc5af5efa6b",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "approvedAt": "2026-09-11T10:53:33.202Z",
+        "digitalSignature": "SEAL-EXEC-23095A6E0356",
+        "authorizedBy": "Super Admin (GreenTech)",
+        "authorityRole": "SUPER_ADMIN"
+      }
+    },
+    {
+      "id": "aud-1789124013119-4nek",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "03:53:33 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:53:33 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:53:33.118Z",
+      "ipAddress": "::1",
+      "signatureHash": "069d389fe29bfc73b8e9a98e5d788b735eb6131f8f3f72c1be7e5691ad5c6fb3",
+      "details": {
+        "sessionId": "17caa496-5f64-4506-90fa-3def37a7254a",
+        "loginTimestamp": "2026-09-11T10:53:33.117Z"
+      }
+    },
+    {
+      "id": "aud-1789121742960-nt2t",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "03:15:42 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:15:42 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:15:42.960Z",
+      "ipAddress": "::1",
+      "signatureHash": "b902caca0edb4fd1c9f52d194dd6631a7d5e07e2866eb9ae91f0630d15b80ae6",
+      "details": {
+        "sessionId": "ddc3623f-967d-46e8-b452-0be9b7439820",
+        "loginTimestamp": "2026-09-11T10:15:42.960Z"
+      }
+    },
+    {
+      "id": "aud-1789121046490-ebog",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "APPROVAL_PASSWORD_UPDATED",
+      "date": "11-Sep-2026",
+      "time": "03:04:06 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:04:06 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:04:06.490Z",
+      "ipAddress": "::1",
+      "signatureHash": "4b01019147efe36b47dd2115a2fea62f439503bbc2982c2280053f480a96e7b5",
+      "details": {
+        "updatedBy": "Super Admin (GreenTech)",
+        "updatedAt": "2026-09-11T10:04:06.487Z"
+      }
+    },
+    {
+      "id": "aud-1789121046469-3gpl",
+      "userId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+      "userName": "Engr. Tariq Khan",
+      "role": "SURVEY_ENGINEER",
+      "action": "PROPOSAL_UNLOCKED",
+      "date": "11-Sep-2026",
+      "time": "03:04:06 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:04:06 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:04:06.468Z",
+      "ipAddress": "::1",
+      "signatureHash": "3b3f4de596be816e1b2a8d0f0088cf24045d26e776055f6a7d3cc50cf84d1108",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "unlockedAt": "2026-09-11T10:04:06.468Z",
+        "authorizedBy": "Engr. Tariq Khan",
+        "authorityRole": "DELEGATED_AUTHORIZED_USER"
+      }
+    },
+    {
+      "id": "aud-1789121046454-dd4u",
+      "userId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+      "userName": "Engr. Tariq Khan",
+      "role": "SURVEY_ENGINEER",
+      "action": "PROPOSAL_SEALED_AND_LOCKED",
+      "date": "11-Sep-2026",
+      "time": "03:04:06 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:04:06 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:04:06.454Z",
+      "ipAddress": "::1",
+      "signatureHash": "124e866b9e7b2b2405f0bda05bd95177c8486cd3226e9cbe32477da9adee3bbd",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "approvedAt": "2026-09-11T10:04:06.450Z",
+        "digitalSignature": "SEAL-EXEC-72FBD1708DBD",
+        "authorizedBy": "Engr. Tariq Khan",
+        "authorityRole": "DELEGATED_AUTHORIZED_USER"
+      }
+    },
+    {
+      "id": "aud-1789121046427-dtur",
+      "userId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+      "userName": "Engr. Tariq Khan",
+      "role": "SURVEY_ENGINEER",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "03:04:06 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:04:06 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:04:06.427Z",
+      "ipAddress": "::1",
+      "signatureHash": "d569ca1000908b2385c014b2b4004613e93f0515aaad64df876143168ad7f96e",
+      "details": {
+        "sessionId": "a50f5d40-f2ff-4081-9a23-3dec7b73a320",
+        "loginTimestamp": "2026-09-11T10:04:06.427Z"
+      }
+    },
+    {
+      "id": "aud-1789121046283-sask",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOCK_PERMISSION_CHANGED",
+      "date": "11-Sep-2026",
+      "time": "03:04:06 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:04:06 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:04:06.282Z",
+      "ipAddress": "::1",
+      "signatureHash": "8a99b7a4edb4b04e6e648d45dc5eea6c17bd2b6e82220937b5fecbea4fb4ddf8",
+      "details": {
+        "targetUserId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+        "targetUserEmail": "tariq@greentech.pk",
+        "targetUserName": "Engr. Tariq Khan",
+        "canLockProposals": true
+      }
+    },
+    {
+      "id": "aud-1789121046235-hkwn",
+      "userId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+      "userName": "Engr. Tariq Khan",
+      "role": "SURVEY_ENGINEER",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "03:04:06 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:04:06 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:04:06.235Z",
+      "ipAddress": "::1",
+      "signatureHash": "46b17d2ab511babedd59d63e951cbc9f4701f8d3a4b2544dd0948fbd944baa43",
+      "details": {
+        "sessionId": "bc737b17-499d-46eb-8cf9-94fce2ce6274",
+        "loginTimestamp": "2026-09-11T10:04:06.235Z"
+      }
+    },
+    {
+      "id": "aud-1789121046088-cy3l",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOCK_PERMISSION_CHANGED",
+      "date": "11-Sep-2026",
+      "time": "03:04:06 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:04:06 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:04:06.087Z",
+      "ipAddress": "::1",
+      "signatureHash": "611050d0689fd09db14b326e054de33f43c862dd3fb1ed48761ea922721c7865",
+      "details": {
+        "targetUserId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+        "targetUserEmail": "tariq@greentech.pk",
+        "targetUserName": "Engr. Tariq Khan",
+        "canLockProposals": false
+      }
+    },
+    {
+      "id": "aud-1789121046059-igiy",
+      "userId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+      "userName": "Engr. Tariq Khan",
+      "role": "SURVEY_ENGINEER",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "03:04:06 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:04:06 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:04:06.058Z",
+      "ipAddress": "::1",
+      "signatureHash": "398bf6bccf6313a4a76e4e5305210570ec6aaaa99c6893339b04120e831a8ef8",
+      "details": {
+        "sessionId": "c749d0ca-5c1b-4a8f-b6bc-0c5d3dd051a3",
+        "loginTimestamp": "2026-09-11T10:04:06.058Z"
+      }
+    },
+    {
+      "id": "aud-1789121045926-em2d",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "APPROVAL_PASSWORD_UPDATED",
+      "date": "11-Sep-2026",
+      "time": "03:04:05 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:04:05 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:04:05.926Z",
+      "ipAddress": "::1",
+      "signatureHash": "4f36b23e7db277002d497830428be0b98d905be0731e26b312a674c0ff52c2b7",
+      "details": {
+        "updatedBy": "Super Admin (GreenTech)",
+        "updatedAt": "2026-09-11T10:04:05.922Z"
+      }
+    },
+    {
+      "id": "aud-1789121045866-bwd8",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "03:04:05 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:04:05 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:04:05.865Z",
+      "ipAddress": "::1",
+      "signatureHash": "584e3da9f77097300c347a6f8a56afd8f1f47372e2061f19e7297287e9cf962b",
+      "details": {
+        "sessionId": "23b1b594-7343-4543-83c3-5d58637f02e6",
+        "loginTimestamp": "2026-09-11T10:04:05.865Z"
+      }
+    },
+    {
+      "id": "aud-1789120986987-qnlc",
+      "userId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+      "userName": "Engr. Tariq Khan",
+      "role": "SURVEY_ENGINEER",
+      "action": "PROPOSAL_SEALED_AND_LOCKED",
+      "date": "11-Sep-2026",
+      "time": "03:03:06 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:03:06 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:03:06.986Z",
+      "ipAddress": "::1",
+      "signatureHash": "0f37adf71642b5d13f5271ee43cd3320233b7c6a75806a846caa911dad2e5c3a",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "approvedAt": "2026-09-11T10:03:06.982Z",
+        "digitalSignature": "SEAL-EXEC-C4A237C31A67",
+        "authorizedBy": "Engr. Tariq Khan",
+        "authorityRole": "DELEGATED_AUTHORIZED_USER"
+      }
+    },
+    {
+      "id": "aud-1789120986925-44p7",
+      "userId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+      "userName": "Engr. Tariq Khan",
+      "role": "SURVEY_ENGINEER",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "03:03:06 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:03:06 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:03:06.925Z",
+      "ipAddress": "::1",
+      "signatureHash": "765b6d23afa6182dc5b5487bf6b91509cafb658eeb6224e941e192046f51c129",
+      "details": {
+        "sessionId": "628c28cb-1bfc-4012-8cf3-ac3c964dba6a",
+        "loginTimestamp": "2026-09-11T10:03:06.925Z"
+      }
+    },
+    {
+      "id": "aud-1789120986798-frcb",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "APPROVAL_PASSWORD_UPDATED",
+      "date": "11-Sep-2026",
+      "time": "03:03:06 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:03:06 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:03:06.798Z",
+      "ipAddress": "::1",
+      "signatureHash": "87e5c6d231b041e96378a422ffcca260aaf2c427b66b37eae0322146d2bf718f",
+      "details": {
+        "updatedBy": "Super Admin (GreenTech)",
+        "updatedAt": "2026-09-11T10:03:06.796Z"
+      }
+    },
+    {
+      "id": "aud-1789120986741-offm",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "03:03:06 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:03:06 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:03:06.741Z",
+      "ipAddress": "::1",
+      "signatureHash": "c138f8110fb5fa22ca3da5f068e3b6d51298133706e36c09fd3ff98d607479e2",
+      "details": {
+        "sessionId": "aae09c8c-5255-4697-a43b-c56315ce9f00",
+        "loginTimestamp": "2026-09-11T10:03:06.741Z"
+      }
+    },
+    {
+      "id": "aud-1789120976910-pao2",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "03:02:56 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:02:56 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:02:56.910Z",
+      "ipAddress": "::1",
+      "signatureHash": "816ec77d3caf965bc54b1c02f8d44bd5c192c8dac6c32c216abdf98afe10ddba",
+      "details": {
+        "sessionId": "42a38972-10c2-48cc-8bcb-cdb098a5c2ed",
+        "loginTimestamp": "2026-09-11T10:02:56.909Z"
+      }
+    },
+    {
+      "id": "aud-1789120901071-7ekz",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "STOCK_SKU_CREATED",
+      "date": "11-Sep-2026",
+      "time": "03:01:41 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:01:41 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:01:41.071Z",
+      "ipAddress": "::1",
+      "signatureHash": "a707a389e06a2f2daeedb627a46e0ac9e5695f9bd5f79b5d9d2994fdfd42015c",
+      "details": {
+        "category": "PANELS",
+        "warehouse": "Central Hub (Karachi Port)",
+        "totalStock": 0,
+        "unitCostPkr": 0,
+        "notes": "New SKU registered in Warehouse Master"
+      }
+    },
+    {
+      "id": "aud-1789120840225-uy5r",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "STOCK_SKU_CREATED",
+      "date": "11-Sep-2026",
+      "time": "03:00:40 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 03:00:40 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T10:00:40.225Z",
+      "ipAddress": "::1",
+      "signatureHash": "2ced2df22ccf7f91eb245b88ddc230057061e83dc4e5f6d36c279c5a7a97ceaa",
+      "details": {
+        "category": "PANELS",
+        "warehouse": "Central Hub (Karachi Port)",
+        "totalStock": 0,
+        "unitCostPkr": 0,
+        "notes": "New SKU registered in Warehouse Master"
+      }
+    },
+    {
+      "id": "aud-1789119873455-qo75",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "APPROVAL_PASSWORD_UPDATED",
+      "date": "11-Sep-2026",
+      "time": "02:44:33 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:44:33 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:44:33.454Z",
+      "ipAddress": "::1",
+      "signatureHash": "8192ae51388e4a0f686bc9c29862e1360da02f86619f5ad4c9af3db46521c8e9",
+      "details": {
+        "updatedBy": "Super Admin (GreenTech)",
+        "updatedAt": "2026-09-11T09:44:33.452Z"
+      }
+    },
+    {
+      "id": "aud-1789119760359-wo6h",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "02:42:40 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:42:40 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:42:40.357Z",
+      "ipAddress": "::1",
+      "signatureHash": "d02a3f02ddaf9fc876ee6c7ac6cd14db5ea9eb1039e343d219c5a7b6c30b3546",
+      "details": {
+        "sessionId": "f0f94e9e-043c-49a9-a98e-2966997e829d",
+        "loginTimestamp": "2026-09-11T09:42:40.357Z"
+      }
+    },
+    {
+      "id": "aud-1789119738113-i0io",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "02:42:18 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:42:18 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:42:18.113Z",
+      "ipAddress": "::1",
+      "signatureHash": "70abf1850d747706563dd93b7aa5284ac3ca1e30ab2ab5facf70b6be1d9405b1",
+      "details": {
+        "sessionId": "36622869-5086-4c96-82f3-c0cc54810eff",
+        "loginTimestamp": "2026-09-11T09:42:18.112Z"
+      }
+    },
+    {
+      "id": "aud-1789119640895-z36t",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "APPROVAL_PASSWORD_UPDATED",
+      "date": "11-Sep-2026",
+      "time": "02:40:40 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:40:40 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:40:40.895Z",
+      "ipAddress": "::1",
+      "signatureHash": "8825d3e28cacc7d261dd98c2867158e70272b579233a65b38d64c564777fd4fd",
+      "details": {
+        "updatedBy": "Super Admin (GreenTech)",
+        "updatedAt": "2026-09-11T09:40:40.892Z"
+      }
+    },
+    {
+      "id": "aud-1789119640880-1tqn",
+      "userId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+      "userName": "Engr. Tariq Khan",
+      "role": "SURVEY_ENGINEER",
+      "action": "PROPOSAL_UNLOCKED",
+      "date": "11-Sep-2026",
+      "time": "02:40:40 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:40:40 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:40:40.880Z",
+      "ipAddress": "::1",
+      "signatureHash": "ea4352a97d71e2c27d0e40a648bbc36eda21d3230cc2dc334b4781ae1b57281b",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "unlockedAt": "2026-09-11T09:40:40.880Z",
+        "authorizedBy": "Engr. Tariq Khan",
+        "authorityRole": "DELEGATED_AUTHORIZED_USER"
+      }
+    },
+    {
+      "id": "aud-1789119640867-5zhy",
+      "userId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+      "userName": "Engr. Tariq Khan",
+      "role": "SURVEY_ENGINEER",
+      "action": "PROPOSAL_SEALED_AND_LOCKED",
+      "date": "11-Sep-2026",
+      "time": "02:40:40 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:40:40 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:40:40.866Z",
+      "ipAddress": "::1",
+      "signatureHash": "4566df6482ab8d40950a9ca6a2d6c0abf5b8358e11af483ab61c24c87d1b2f8a",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "approvedAt": "2026-09-11T09:40:40.862Z",
+        "digitalSignature": "SEAL-EXEC-2CD1BC54CD80",
+        "authorizedBy": "Engr. Tariq Khan",
+        "authorityRole": "DELEGATED_AUTHORIZED_USER"
+      }
+    },
+    {
+      "id": "aud-1789119640842-o2a0",
+      "userId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+      "userName": "Engr. Tariq Khan",
+      "role": "SURVEY_ENGINEER",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "02:40:40 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:40:40 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:40:40.841Z",
+      "ipAddress": "::1",
+      "signatureHash": "a8d11eeb251f4e837aebdbf0482371f3cc3ffcb66fd8f8eff649fb4134614993",
+      "details": {
+        "sessionId": "6965c6a0-c4a8-4bcd-bbdc-cd9e311cb740",
+        "loginTimestamp": "2026-09-11T09:40:40.841Z"
+      }
+    },
+    {
+      "id": "aud-1789119640711-mu7y",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOCK_PERMISSION_CHANGED",
+      "date": "11-Sep-2026",
+      "time": "02:40:40 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:40:40 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:40:40.710Z",
+      "ipAddress": "::1",
+      "signatureHash": "d78bacea6de860a048be9c0caf3b6d1b180a2ba150d42adff9cc426a2b0f148e",
+      "details": {
+        "targetUserId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+        "targetUserEmail": "tariq@greentech.pk",
+        "targetUserName": "Engr. Tariq Khan",
+        "canLockProposals": true
+      }
+    },
+    {
+      "id": "aud-1789119640644-y3ni",
+      "userId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+      "userName": "Engr. Tariq Khan",
+      "role": "SURVEY_ENGINEER",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "02:40:40 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:40:40 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:40:40.644Z",
+      "ipAddress": "::1",
+      "signatureHash": "2244403dd8fcbb6db07822045336a04e0b2f36fdc2e91028e0a45b87900e7dab",
+      "details": {
+        "sessionId": "0e8805b9-561a-4ef8-a1ec-9ff9e06872d7",
+        "loginTimestamp": "2026-09-11T09:40:40.644Z"
+      }
+    },
+    {
+      "id": "aud-1789119640497-uo51",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "ADMIN_USER_CREATED",
+      "date": "11-Sep-2026",
+      "time": "02:40:40 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:40:40 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:40:40.497Z",
+      "ipAddress": "::1",
+      "signatureHash": "b5befe9e6a5fac5a2ffc0604228d9e904c2ca640cf04326613a61427abd305f5",
+      "details": {
+        "newUserId": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+        "newUserEmail": "tariq@greentech.pk",
+        "newUserRole": "SURVEY_ENGINEER",
+        "designation": "Solar Engineer"
+      }
+    },
+    {
+      "id": "aud-1789119640333-rwl9",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "APPROVAL_PASSWORD_UPDATED",
+      "date": "11-Sep-2026",
+      "time": "02:40:40 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:40:40 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:40:40.333Z",
+      "ipAddress": "::1",
+      "signatureHash": "bc2c74f3846a77a0dcef5e0001215468a6002c4f1765384440369d3131518d41",
+      "details": {
+        "updatedBy": "Super Admin (GreenTech)",
+        "updatedAt": "2026-09-11T09:40:40.330Z"
+      }
+    },
+    {
+      "id": "aud-1789119640284-fvnz",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "02:40:40 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:40:40 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:40:40.284Z",
+      "ipAddress": "::1",
+      "signatureHash": "4b01de700a851f91b7f2e12793e2c4cd95d01e95a0f4fdae93316439fcf294d4",
+      "details": {
+        "sessionId": "2504ad46-b8da-41b2-91f3-8f58ef3c2064",
+        "loginTimestamp": "2026-09-11T09:40:40.284Z"
+      }
+    },
+    {
+      "id": "aud-1789119571098-t83u",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "APPROVAL_PASSWORD_UPDATED",
+      "date": "11-Sep-2026",
+      "time": "02:39:31 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:39:31 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:39:31.097Z",
+      "ipAddress": "::1",
+      "signatureHash": "318a58fe17d3894aede04904e686531a940afdc0dd9cee33f320b60ed91ec6ff",
+      "details": {
+        "updatedBy": "Super Admin (GreenTech)",
+        "updatedAt": "2026-09-11T09:39:31.095Z"
+      }
+    },
+    {
+      "id": "aud-1789119571053-7nu2",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "02:39:31 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:39:31 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:39:31.052Z",
+      "ipAddress": "::1",
+      "signatureHash": "c4056edddf4722e962d58196346ae7a5039b6461227732b2956bdf6b2e1df2fc",
+      "details": {
+        "sessionId": "29efbaec-f2bf-4a75-865c-5eaebede9120",
+        "loginTimestamp": "2026-09-11T09:39:31.052Z"
+      }
+    },
+    {
+      "id": "aud-1789119047736-vbqc",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "APPROVAL_PASSWORD_UPDATED",
+      "date": "11-Sep-2026",
+      "time": "02:30:47 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:30:47 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:30:47.736Z",
+      "ipAddress": "::1",
+      "signatureHash": "4cf443aed9ca4e20a4fc8d802b4ad29399fc2d4667eb1faa5b0f0ed438ac132b",
+      "details": {
+        "updatedBy": "Super Admin (GreenTech)",
+        "updatedAt": "2026-09-11T09:30:47.734Z"
+      }
+    },
+    {
+      "id": "aud-1789119047720-9orz",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROPOSAL_UNLOCKED",
+      "date": "11-Sep-2026",
+      "time": "02:30:47 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:30:47 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:30:47.720Z",
+      "ipAddress": "::1",
+      "signatureHash": "58a0012355c9ac57532e0dbf426cd85560396ddd50977c261532999d16338ff8",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "unlockedAt": "2026-09-11T09:30:47.720Z",
+        "authorizedBy": "Super Admin (GreenTech)",
+        "authorityRole": "SUPER_ADMIN"
+      }
+    },
+    {
+      "id": "aud-1789119047700-pejk",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "PROPOSAL_SEALED_AND_LOCKED",
+      "date": "11-Sep-2026",
+      "time": "02:30:47 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:30:47 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:30:47.700Z",
+      "ipAddress": "::1",
+      "signatureHash": "b7d5138429e2deba75f8e622e8b8515aea51a11e50a0def0a1b18ae48b4ff41d",
+      "details": {
+        "projectId": "859917de-53b8-451e-9895-ff9e3e49ac82",
+        "projectCode": "SLR-PK-2026-3709",
+        "clientName": "salman khan",
+        "approvedAt": "2026-09-11T09:30:47.694Z",
+        "digitalSignature": "SEAL-EXEC-FFBC21A6B482",
+        "authorizedBy": "Super Admin (GreenTech)",
+        "authorityRole": "SUPER_ADMIN"
+      }
+    },
+    {
+      "id": "aud-1789119047651-5i9z",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "APPROVAL_PASSWORD_UPDATED",
+      "date": "11-Sep-2026",
+      "time": "02:30:47 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:30:47 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:30:47.650Z",
+      "ipAddress": "::1",
+      "signatureHash": "f12447e3373592ce93e6aec6907464cd9bbb18bfeca63078fafc0858d88dfa46",
+      "details": {
+        "updatedBy": "Super Admin (GreenTech)",
+        "updatedAt": "2026-09-11T09:30:47.647Z"
+      }
+    },
+    {
+      "id": "aud-1789119047596-lhil",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "date": "11-Sep-2026",
+      "time": "02:30:47 PM (PKT)",
+      "pktTimestamp": "11-Sep-2026 | 02:30:47 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-09-11T09:30:47.596Z",
+      "ipAddress": "::1",
+      "signatureHash": "32f4d6f43c63b3dba44a754b743ca3e592721c028def551a5d38d64660984631",
+      "details": {
+        "sessionId": "3b728c42-df7e-42c5-bed7-dd5f65f09887",
+        "loginTimestamp": "2026-09-11T09:30:47.595Z"
+      }
+    }
+  ],
+  "users": [
+    {
+      "id": "usr-super-admin-001",
+      "fullName": "Super Admin (GreenTech)",
+      "email": "admin@greentech.pk",
+      "passwordHash": "$2a$10$fMXVEybfqPRpPzVq01d27uECQcCDEKCgpBvEHa/7WzQWoX3/yJVh.",
+      "role": "SUPER_ADMIN",
+      "designation": "Chief Executive Officer (CEO)",
+      "isApproved": true,
+      "canLockProposals": true,
+      "avatarUrl": null,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "7b6ff47c-55f2-4c85-b1c1-e0277faefdf9",
+      "fullName": "Engr. Tariq Khan",
+      "email": "tariq@greentech.pk",
+      "passwordHash": "$2a$10$GYrQ9rhFEiMpeDSGxXp4reXGo9yEkC3MPYkIYbGBGtT5Qr9KLursK",
+      "role": "SURVEY_ENGINEER",
+      "designation": "Solar Engineer",
+      "isApproved": false,
+      "canLockProposals": true,
+      "avatarUrl": null,
+      "createdAt": "2026-09-11T09:40:40.494Z"
+    }
+  ],
+  "securitySettings": {
+    "approvalPassword": "Password123!",
+    "updatedAt": "2026-09-11T10:04:06.487Z",
+    "updatedBy": "usr-super-admin-001"
+  }
+}
