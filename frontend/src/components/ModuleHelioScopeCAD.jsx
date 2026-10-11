@@ -575,8 +575,40 @@ export default function ModuleHelioScopeCAD({
   const inverterOptions = useMemo(() => buildInverterOptions(), []);
   const TIER1_INVERTERS = inverterOptions;
 
+  // ★ AUTO INVERTER MATCH: system kWp ke hisab se best inverter (ratio ~1.25)
+  const userOverrodeInverterRef = useRef(false);
+  useEffect(() => {
+    if (userOverrodeInverterRef.current) return;
+    if (!activeKwp || activeKwp <= 0) return;
+    const targetAcKw = activeKwp / 1.25;
+    let best = null, bestDiff = Infinity;
+    inverterOptions.forEach(o => {
+      const diff = Math.abs(o.kw - targetAcKw);
+      if (diff < bestDiff) { bestDiff = diff; best = o; }
+    });
+    if (best && best.value !== selectedInverterModel) {
+      setSelectedInverterModel(best.value);
+      setInverterCapacityKw(best.kw);
+    }
+  }, [activeKwp, inverterOptions, selectedInverterModel]);
+
   // Target string size (panels per string) for electrical overlay
   const [targetStringSize, setTargetStringSize] = useState(20);
+
+  // ★ STRINGING VOLTAGE SAFETY: max safe panels inverter maxDcVoltage se
+  const maxSafePanelsPerString = useMemo(() => {
+    const inv = getInverterSpec(selectedInverterModel);
+    const voc = currentModuleSpec?.voc || 49.7;
+    const coeff = Math.abs(currentModuleSpec?.tempCoeffPmaxPct || 0.29) / 100;
+    const coldFactor = 1 + coeff * 30; // -5°C winter
+    const maxDc = inv?.maxDcVoltage || 1000;
+    return Math.max(4, Math.floor(maxDc / (voc * coldFactor)));
+  }, [selectedInverterModel, currentModuleSpec]);
+
+  useEffect(() => {
+    if (targetStringSize > maxSafePanelsPerString) setTargetStringSize(maxSafePanelsPerString);
+    if (targetPanelsPerString > maxSafePanelsPerString) setTargetPanelsPerString(maxSafePanelsPerString);
+  }, [maxSafePanelsPerString, targetStringSize, targetPanelsPerString]);
 
   // Auto-enable electrical overlay when switching to STRINGING tab
   useEffect(() => {
@@ -1571,6 +1603,7 @@ export default function ModuleHelioScopeCAD({
                     return found ? found.value : (inverterOptions[8]?.value || selectedInverterModel);
                   })()}
                   onChange={(e) => {
+                    userOverrodeInverterRef.current = true;
                     const spec = getInverterSpec(e.target.value);
                     setSelectedInverterModel(spec?.id || e.target.value);
                     if (spec) setInverterCapacityKw(spec.kw);
@@ -1612,16 +1645,23 @@ export default function ModuleHelioScopeCAD({
                 </div>
                 <input
                   type="range"
-                  min="18"
-                  max="22"
+                  min="6"
+                  max={maxSafePanelsPerString}
                   step="1"
-                  value={targetStringSize}
-                  onChange={(e) => setTargetStringSize(Number(e.target.value))}
+                  value={Math.min(targetStringSize, maxSafePanelsPerString)}
+                  onChange={(e) => {
+                    const v = Number(e.target.value);
+                    setTargetStringSize(v);
+                    setTargetPanelsPerString(v);
+                  }}
                   className="w-full accent-cyan-500 cursor-pointer"
                 />
                 <div className="flex justify-between text-[8px] text-slate-500 font-mono">
-                  <span>18</span><span>20 (std)</span><span>22</span>
+                  <span>6</span><span>{Math.round(maxSafePanelsPerString / 2)}</span><span>{maxSafePanelsPerString} (safe max)</span>
                 </div>
+                <p className="text-[8px] text-cyan-600 font-mono">
+                  🛡️ Safe max: {maxSafePanelsPerString} panels/string ({getInverterSpec(selectedInverterModel)?.maxDcVoltage || 1000}V limit)
+                </p>
               </div>
             </div>
           </div>
@@ -1864,7 +1904,7 @@ export default function ModuleHelioScopeCAD({
                 isAdjustingPosition={isAdjustingPosition}
                 setIsAdjustingPosition={setIsAdjustingPosition}
                 rowSpacing={rowSpacingM}
-                shadowPitch={shadowAnalysis?.totalRowPitchMeters || rowSpacingM}
+                shadowPitch={null}
                 arrayScale={arrayScale}
                 clearTrigger={clearTrigger}
                 colSpacing={moduleSpacingM}
