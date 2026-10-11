@@ -1657,7 +1657,7 @@ export default function App() {
       <CopilotDrawer
         projectContext={{
           currentPage: activeTab,
-          projects: projects,
+          projects: projectsList || [],
           activeProject: activeProject
         }}
         activeProject={activeProject}

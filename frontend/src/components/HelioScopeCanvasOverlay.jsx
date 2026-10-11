@@ -284,7 +284,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   const [localMove, setLocalMove] = useState(false);
   const [pitchAuto, setPitchAuto] = useState(true); // true = winter-shadow AUTO pitch (tilt-linked)
 
-  // ★ Sun Time Simulation
+  // ★ Sun Time Simulation — state & refs (useEffects moved AFTER requestRedraw to avoid TDZ)
   const [timeSim, setTimeSim] = useState(false);
   const [sunHour, setSunHour] = useState(12);
   const [sunDay, setSunDay] = useState(172); // Jun 21
@@ -292,21 +292,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   const timeSimRef = useRef(false);
   const simSunRef = useRef({ elevationDeg: 45, azimuthDeg: 180 });
   const playIntervalRef = useRef(null);
-
-  useEffect(() => {
-    if (!timeSim) {
-      timeSimRef.current = false;
-      requestRedraw();
-      return;
-    }
-    simSunRef.current = calculateSolarPosition(siteLatitude, sunDay, sunHour);
-    timeSimRef.current = true;
-    requestRedraw();
-  }, [timeSim, sunDay, sunHour, siteLatitude, requestRedraw]);
-
-  useEffect(() => () => {
-    if (playIntervalRef.current) clearInterval(playIntervalRef.current);
-  }, []);
 
   const toggleSunPlay = () => {
     if (playIntervalRef.current) {
@@ -337,6 +322,22 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         drawSceneRef.current();
       }
     });
+  }, []);
+
+  // ★ Sun Time Simulation useEffects — placed here (AFTER requestRedraw) to avoid TDZ crash
+  useEffect(() => {
+    if (!timeSim) {
+      timeSimRef.current = false;
+      requestRedraw();
+      return;
+    }
+    simSunRef.current = calculateSolarPosition(siteLatitude, sunDay, sunHour);
+    timeSimRef.current = true;
+    requestRedraw();
+  }, [timeSim, sunDay, sunHour, siteLatitude, requestRedraw]);
+
+  useEffect(() => () => {
+    if (playIntervalRef.current) clearInterval(playIntervalRef.current);
   }, []);
 
   useImperativeHandle(ref, () => ({
