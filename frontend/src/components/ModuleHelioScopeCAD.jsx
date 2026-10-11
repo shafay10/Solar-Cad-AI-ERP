@@ -2012,7 +2012,11 @@ export default function ModuleHelioScopeCAD({
             <div className="flex flex-col items-center">
               <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Performance Ratio</span>
               <span className="text-sm font-black text-emerald-400 font-mono leading-tight">
-                81.5% <span className="text-[10px] font-normal text-slate-400">PR</span>
+                {activeModulesCount > 0 ? (
+                  <>81.5% <span className="text-[10px] font-normal text-slate-400">PR</span></>
+                ) : (
+                  "—"
+                )}
               </span>
             </div>
             <div className="h-6 w-px bg-slate-800" />
