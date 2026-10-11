@@ -1655,6 +1655,11 @@ export default function App() {
 
       {/* Floating Interactive GreenTech AI Copilot */}
       <CopilotDrawer
+        projectContext={{
+          currentPage: activeTab,
+          projects: projects,
+          activeProject: activeProject
+        }}
         activeProject={activeProject}
         token={token}
         currentUser={currentUser}
