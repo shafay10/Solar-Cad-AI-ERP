@@ -13,25 +13,10 @@ import {
 } from "../services/helioscopeEngine.js";
 
 /**
- * HelioScopeCanvasOverlay
- * Production-Grade 60 FPS HTML5 Vector CAD Engine for Solar Arrays.
- * Implements:
- *   1. HelioScope Field Segment Workflow: Click points to outline roof, yellow boundary with anchor handles,
- *      snaps to close, and immediately auto-fills the polygon with packed modules (Ray-Casting layout).
- *   2. Right-Click Edge Alignment: Right-click any polygon edge to open "Align modules to this edge" context menu.
- *   3. Dynamic Inter-row Winter Solstice shadow pitch calculation.
- *   4. High-efficiency photorealistic Tier-1 Monocrystalline Half-Cut Cell rendering with silver frame, busbars & glass reflection.
- *   5. Hard Map Lock during drawing modes.
- *   6. Draggable Array Anchor Gizmo with (ΔX, ΔY) offset positioning.
- *   7. Target Capacity (kWp) Cap limiting module packing.
- *   ★ 8. NEW: Azimuth Quick Presets (0-270°), Array Lock (drag protect), Move Mode toggle,
- *      Tilt-linked AUTO Shadow Pitch (winter solstice), Electrical overlay wattage-accurate inverter qty.
- */
-/**
- * Renders physical mounting structure underneath each module row / module based on rackingType:
- * - FLUSH_MOUNT: Short flat base rails underneath panels with thin shadow lines.
- * - L2_ELEVATED (1.5m): Vertical galvanized iron legs (silver pillars #94a3b8) dropping 1.5m downward with visible diagonal bracing struts, foundation base plate footings (#1e293b), and footing shadows.
- * - L3_ELEVATED (2.5m): Taller heavy-duty gazebo/shed columns (2.5m clearance) with double cross-beams and X bracing underneath panels.
+ * HelioScopeCanvasOverlay — Production-Grade 60 FPS HTML5 Vector CAD Engine
+ * ★ v2.3: Crash guard (non-finite panel skip), Shadow stretch cap (140px),
+ *   Tool-change SnapBox point clear, PAN_VIEW bypass, Sim shadows boosted + sun badge,
+ *   Multi-keepout, SnapBox first-point marker, Edge-align wide hit area (42px).
  */
 function renderRackingUnderneath(ctx, cornersPx, rackingType, showShadows) {
   if (!ctx || !cornersPx || cornersPx.length < 4) return;
@@ -41,20 +26,14 @@ function renderRackingUnderneath(ctx, cornersPx, rackingType, showShadows) {
     const isL2 = norm.includes("L2") && !isL3;
     const isFlush = !isL2 && !isL3;
 
-    // Calculate pixel scale (pixels per meter based on standard ~1.13m portrait width or ~2.28m length)
     const edge01 = Math.hypot(cornersPx[1].x - cornersPx[0].x, cornersPx[1].y - cornersPx[0].y);
     const edge03 = Math.hypot(cornersPx[3].x - cornersPx[0].x, cornersPx[3].y - cornersPx[0].y);
     const minDim = Math.min(edge01, edge03);
     const scalePx = Math.max(6, minDim / 1.13);
 
     if (isFlush) {
-      // -------------------------------------------------------------
-      // FLUSH MOUNT: Flat base mounting rails with thin shadow lines
-      // -------------------------------------------------------------
       ctx.save();
       ctx.lineCap = "round";
-
-      // Two parallel aluminium rails running underneath
       const r1Start = {
         x: cornersPx[0].x * 0.8 + cornersPx[1].x * 0.2,
         y: cornersPx[0].y * 0.8 + cornersPx[1].y * 0.2
@@ -71,8 +50,6 @@ function renderRackingUnderneath(ctx, cornersPx, rackingType, showShadows) {
         x: cornersPx[3].x * 0.2 + cornersPx[2].x * 0.8,
         y: cornersPx[3].y * 0.2 + cornersPx[2].y * 0.8
       };
-
-      // Thin shadow under rails
       ctx.strokeStyle = "rgba(15, 23, 42, 0.4)";
       ctx.lineWidth = 2.2;
       ctx.beginPath();
@@ -81,8 +58,6 @@ function renderRackingUnderneath(ctx, cornersPx, rackingType, showShadows) {
       ctx.moveTo(r2Start.x + 1, r2Start.y + 1);
       ctx.lineTo(r2End.x + 1, r2End.y + 1);
       ctx.stroke();
-
-      // Aluminum mounting rail (silver/slate)
       ctx.strokeStyle = "#64748b";
       ctx.lineWidth = 1.6;
       ctx.beginPath();
@@ -91,21 +66,14 @@ function renderRackingUnderneath(ctx, cornersPx, rackingType, showShadows) {
       ctx.moveTo(r2Start.x, r2Start.y);
       ctx.lineTo(r2End.x, r2End.y);
       ctx.stroke();
-
       ctx.restore();
       return;
     }
 
-    // -------------------------------------------------------------
-    // ELEVATED RACKING (L2: 1.5m / L3: 2.5m)
-    // -------------------------------------------------------------
     const heightM = isL3 ? 2.5 : 1.5;
-    // For L2_ELEVATED / L3_ELEVATED, render the leg drop straight down along Y-axis without skewing module body
     const legDropPx = Math.min(isL3 ? 22 : 14, Math.max(isL3 ? 8 : 5, heightM * scalePx * 0.18));
 
     ctx.save();
-
-    // Vertical pillars drop straight down along the Y-axis without skewing the module body
     const pillars = cornersPx.map(p => ({
       topX: p.x,
       topY: p.y,
@@ -113,7 +81,6 @@ function renderRackingUnderneath(ctx, cornersPx, rackingType, showShadows) {
       baseY: p.y + legDropPx
     }));
 
-    // 1. Footing ground shadows & Under-table Row Shadow Line
     if (showShadows) {
       ctx.fillStyle = "rgba(15, 23, 42, 0.45)";
       pillars.forEach(pil => {
@@ -121,8 +88,6 @@ function renderRackingUnderneath(ctx, cornersPx, rackingType, showShadows) {
         ctx.ellipse(pil.baseX + 1, pil.baseY + 1, isL3 ? 6 : 4.5, isL3 ? 3.5 : 2.5, 0, 0, Math.PI * 2);
         ctx.fill();
       });
-
-      // Shadow line underneath each table row for elevated racking
       ctx.strokeStyle = "rgba(15, 23, 42, 0.35)";
       ctx.lineWidth = isL3 ? 3.5 : 2.5;
       ctx.beginPath();
@@ -133,36 +98,26 @@ function renderRackingUnderneath(ctx, cornersPx, rackingType, showShadows) {
       ctx.stroke();
     }
 
-    // 2. Foundation Base Plates (Anchored Footings)
     pillars.forEach(pil => {
       ctx.fillStyle = "#1e293b";
       ctx.fillRect(pil.baseX - (isL3 ? 3.5 : 2.5), pil.baseY - (isL3 ? 3 : 2), isL3 ? 7 : 5, isL3 ? 5 : 4);
-      // Silver anchor bolt
       ctx.fillStyle = "#94a3b8";
       ctx.fillRect(pil.baseX - 1, pil.baseY - 1, 2, 2);
     });
 
-    // 3. Diagonal Bracing Struts & Cross-Beams
     if (isL3) {
-      // L3 HEAVY-DUTY GAZEBO / SHED COLUMNS (2.5m Clearance)
-      // Double horizontal cross-beams
       ctx.strokeStyle = "#94a3b8";
       ctx.lineWidth = 1.8;
       ctx.beginPath();
-      // Beam 1: Front bottom cross-beam
       ctx.moveTo(pillars[0].baseX, pillars[0].baseY);
       ctx.lineTo(pillars[1].baseX, pillars[1].baseY);
-      // Beam 2: Rear bottom cross-beam
       ctx.moveTo(pillars[3].baseX, pillars[3].baseY);
       ctx.lineTo(pillars[2].baseX, pillars[2].baseY);
-      // Intermediate girder beam halfway up
       ctx.moveTo(pillars[0].topX, pillars[0].topY + legDropPx * 0.5);
       ctx.lineTo(pillars[1].topX, pillars[1].topY + legDropPx * 0.5);
       ctx.moveTo(pillars[3].topX, pillars[3].topY + legDropPx * 0.5);
       ctx.lineTo(pillars[2].topX, pillars[2].topY + legDropPx * 0.5);
       ctx.stroke();
-
-      // Heavy "X" diagonal bracing between pillars
       ctx.strokeStyle = "#64748b";
       ctx.lineWidth = 1.2;
       ctx.beginPath();
@@ -170,24 +125,19 @@ function renderRackingUnderneath(ctx, cornersPx, rackingType, showShadows) {
       ctx.lineTo(pillars[3].baseX, pillars[3].baseY);
       ctx.moveTo(pillars[3].topX, pillars[3].topY + legDropPx * 0.2);
       ctx.lineTo(pillars[0].baseX, pillars[0].baseY);
-
       ctx.moveTo(pillars[1].topX, pillars[1].topY + legDropPx * 0.2);
       ctx.lineTo(pillars[2].baseX, pillars[2].baseY);
       ctx.moveTo(pillars[2].topX, pillars[2].topY + legDropPx * 0.2);
       ctx.lineTo(pillars[1].baseX, pillars[1].baseY);
       ctx.stroke();
     } else {
-      // L2 ELEVATED (1.5m Clearance): Galvanized Iron Legs with Diagonal Struts
       ctx.strokeStyle = "#64748b";
       ctx.lineWidth = 1.4;
       ctx.beginPath();
-      // Diagonal brace struts from pillar base to table rafter
       ctx.moveTo(pillars[0].topX, pillars[0].topY + legDropPx * 0.3);
       ctx.lineTo(pillars[3].baseX, pillars[3].baseY);
       ctx.moveTo(pillars[1].topX, pillars[1].topY + legDropPx * 0.3);
       ctx.lineTo(pillars[2].baseX, pillars[2].baseY);
-
-      // Bottom tie rail between pillar bases
       ctx.moveTo(pillars[0].baseX, pillars[0].baseY);
       ctx.lineTo(pillars[3].baseX, pillars[3].baseY);
       ctx.moveTo(pillars[1].baseX, pillars[1].baseY);
@@ -195,17 +145,13 @@ function renderRackingUnderneath(ctx, cornersPx, rackingType, showShadows) {
       ctx.stroke();
     }
 
-    // 4. Vertical Galvanized Iron Legs (Pillars dropping downward)
     pillars.forEach(pil => {
-      // Outer shadow/edge for 3D metallic feel
       ctx.strokeStyle = "#334155";
       ctx.lineWidth = isL3 ? 3.5 : 2.8;
       ctx.beginPath();
       ctx.moveTo(pil.topX, pil.topY);
       ctx.lineTo(pil.baseX, pil.baseY);
       ctx.stroke();
-
-      // Inner bright galvanized zinc highlight
       ctx.strokeStyle = isL3 ? "#cbd5e1" : "#94a3b8";
       ctx.lineWidth = isL3 ? 2.2 : 1.6;
       ctx.beginPath();
@@ -279,12 +225,12 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   const drawSceneRef = useRef(null);
   const [placedPanels, setPlacedPanels] = useState([]);
 
-  // ★ NEW: Local Lock / Move / Pitch-mode toggles (parent props ke sath combine hote hain)
+  // ★ Local Lock / Move / Pitch-mode toggles
   const [localLock, setLocalLock] = useState(false);
   const [localMove, setLocalMove] = useState(false);
-  const [pitchAuto, setPitchAuto] = useState(true); // true = winter-shadow AUTO pitch (tilt-linked)
+  const [pitchAuto, setPitchAuto] = useState(true);
 
-  // ★ Sun Time Simulation — state & refs (useEffects moved AFTER requestRedraw to avoid TDZ)
+  // ★ Sun Time Simulation — state & refs
   const [timeSim, setTimeSim] = useState(false);
   const [sunHour, setSunHour] = useState(12);
   const [sunDay, setSunDay] = useState(172); // Jun 21
@@ -312,7 +258,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     { label: "Dec 21", day: 355 }
   ];
 
-  // Top-Level Hoisted Redraw Dispatcher (Safe from Temporal Dead Zone / TDZ errors)
+  // Top-Level Hoisted Redraw Dispatcher (TDZ-safe)
   const requestRedraw = useCallback(() => {
     if (isDrawScheduledRef.current) return;
     isDrawScheduledRef.current = true;
@@ -324,7 +270,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     });
   }, []);
 
-  // ★ Sun Time Simulation useEffects — placed here (AFTER requestRedraw) to avoid TDZ crash
+  // ★ Sun Sim useEffects — AFTER requestRedraw (TDZ-safe)
   useEffect(() => {
     if (!timeSim) {
       timeSimRef.current = false;
@@ -379,15 +325,14 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     requestRedraw();
   }, [requestRedraw]);
 
-  // Drawing & Mouse State stored strictly in Refs (ZERO setState inside mousemove)
-  const p1Ref = useRef(null); // { lat, lng } for ROOF_BOX
-  const mousePosPxRef = useRef(null); // { x, y }
-  const mouseGpsRef = useRef(null); // { lat, lng }
-  const panelsRef = useRef([]); // Cached calculated panels
-  const cachedPanelsRef = useRef([]); // Persistent fallback cache preventing mid-drag/slider flicker
+  // Drawing & Mouse State (refs only)
+  const p1Ref = useRef(null);
+  const mousePosPxRef = useRef(null);
+  const mouseGpsRef = useRef(null);
+  const panelsRef = useRef([]);
+  const cachedPanelsRef = useRef([]);
   window.__helioScopePanelsRef = panelsRef;
 
-  // Keep persistent cache ref updated with latest valid panels
   useEffect(() => {
     const current = (panelsRef.current && panelsRef.current.length > 0) ? panelsRef.current : placedPanels;
     if (Array.isArray(current) && current.length > 0) {
@@ -395,14 +340,13 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     }
   }, [placedPanels]);
 
-  const modulesLayerRef = useRef(null); // Dedicated Leaflet SVG layer on solarModulesPane (zIndex 650)
+  const modulesLayerRef = useRef(null);
   const boundsRef = useRef(null);
   const hoveredModuleIdRef = useRef(null);
   const isDraggingMapRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
   const hasDraggedRef = useRef(false);
 
-  // Draggable Array Anchor Gizmo & Direct Mouse Drag Refs
   const anchorPxRef = useRef(null);
   const nativeAnchorMarkerRef = useRef(null);
   const runModulePackingRef = useRef(null);
@@ -413,17 +357,15 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     gridOffsetRef.current = gridOffset;
   }, [gridOffset]);
 
-  // Direct Mouse Drag & Drop for Solar Arrays (Real-Time Translation)
   const arrayBboxPxRef = useRef(null);
   const isDraggingArrayRef = useRef(false);
   const isHoveringArrayRef = useRef(false);
-  const dragStartMouseGpsRef = useRef(null); // { lat, lng }
+  const dragStartMouseGpsRef = useRef(null);
   const dragStartScreenPxRef = useRef({ x: 0, y: 0 });
   const dragStartOffsetRef = useRef({ x: 0, y: 0 });
   const dragDeltaGpsRef = useRef({ lat: 0, lng: 0 });
   const dragDeltaMetersRef = useRef({ x: 0, y: 0 });
 
-  // Interactive CAD Boundary Lines (Grid / Graph Edges) & Edge / Vertex Dragging
   const activePolyDragRef = useRef(null);
   const hoveredEdgeIndexRef = useRef(-1);
   const isDraggingEdgeRef = useRef(false);
@@ -433,11 +375,9 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   const draggedVertexIndexRef = useRef(-1);
   const dragStartRoofPolyRef = useRef(null);
 
-  // Active Field Segment Drawing Points (in-progress polygon vertices)
   const activePolyPointsRef = useRef([]);
   const [isNearFirstPoint, setIsNearFirstPoint] = useState(false);
 
-  // Sync in-progress drawing points with parent controller
   useEffect(() => {
     if (Array.isArray(activeDrawingPoints)) {
       activePolyPointsRef.current = activeDrawingPoints;
@@ -445,7 +385,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     }
   }, [activeDrawingPoints, requestRedraw]);
 
-  // Clean up drawing points and panels when roof polygon is reset, cleared, or clearTrigger changes
   const prevClearTriggerRef = useRef(clearTrigger);
   useEffect(() => {
     const isClearAction = clearTrigger > prevClearTriggerRef.current;
@@ -470,7 +409,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     }
   }, [roofPolygon, clearTrigger, map, setActiveDrawingPoints, requestRedraw]);
 
-  // Explicit Clear All: when user clicks "Clear All", explicitly reset cache ref so plates actually vanish from screen
   const handleClearAll = useCallback(() => {
     activePolyPointsRef.current = [];
     p1Ref.current = null;
@@ -491,7 +429,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     if (typeof requestRedraw === "function") requestRedraw();
   }, [map, setRoofPolygon, setActiveDrawingPoints, onClearDrawing, requestRedraw]);
 
-  // Floating Right-Click Edge Alignment Context Menu
   const [edgeMenu, setEdgeMenu] = useState({
     show: false,
     x: 0,
@@ -500,11 +437,8 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     edgeIndex: -1
   });
 
-  // ★ NEW: Effective flags — parent props + local toggles combined
   const effLock = isLocked || localLock;
   const moveActive = isAdjustingPosition || localMove;
-  // ★ NEW: AUTO pitch = engine winter-shadow formula (tilt-linked).
-  // Manual = jab parent ne explicit shadowPitch diya ho, ya user MANUAL chip pe ho.
   const isAutoPitch = pitchAuto && (shadowPitch === null || shadowPitch === undefined);
 
   const isDrawing = activeCadTool === "FIELD_SEGMENT" || activeCadTool === "ROOF_PERIMETER" || activeCadTool === "ROOF_BOX" || activeCadTool === "OBSTACLE_CIRCLE";
@@ -532,14 +466,13 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       if (container) container.style.cursor = "grab";
     }
 
-    // ★ FIX: Lock ON = Leaflet native drag bhi band (canvas panBy single path)
-    // — pehle double-pan ho raha tha isliye lock "jhoota" lag raha tha
+    // ★ Lock ON = Leaflet native drag band (canvas panBy single path)
     if (effLock && !isDrawing) {
       map.dragging?.disable();
     }
   }, [map, isDrawing, effLock]);
 
-  // Handle ESC key to cancel active drawing
+  // ESC key handler
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
@@ -554,7 +487,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [setActiveCadTool]);
 
-  // Coordinate Conversion Helper: GPS -> Canvas Container Pixels
   const toPx = useCallback((lat, lng) => {
     if (!map) return { x: 0, y: 0 };
     const numLat = Number(lat);
@@ -568,7 +500,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     }
   }, [map]);
 
-  // Coordinate Conversion Helper: Canvas Pixels -> GPS
   const toGps = useCallback((x, y) => {
     if (!map) return null;
     try {
@@ -580,7 +511,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     }
   }, [map]);
 
-  // Distance in meters between two GPS coordinates
   const distanceBetweenGps = useCallback((p1, p2) => {
     if (!map || !p1 || !p2) return 0;
     try {
@@ -591,7 +521,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   }, [map]);
 
   // =========================================================================
-  // 2. CANVAS VECTOR SCENE RENDERER & REDRAW SYSTEM
+  // 2. CANVAS VECTOR SCENE RENDERER
   // =========================================================================
   const drawScene = useCallback(() => {
     const canvas = canvasRef.current;
@@ -601,7 +531,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     const container = map.getContainer();
     if (!container) return;
 
-    // Check if 3D WebGL Simulation modal or view is currently open
     const is3DActive = !!document.querySelector('.three-canvas, [data-3d-active="true"], [class*="3d-modal"], [class*="Three"]');
     if (is3DActive) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -623,9 +552,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, width, height);
 
-    // -------------------------------------------------------------
-    // A. DRAW COMPLETED ROOFTOP CAD BOUNDARY (#38bdf8 dashed grid)
-    // -------------------------------------------------------------
+    // A. COMPLETED ROOFTOP CAD BOUNDARY
     const activePoly = activePolyDragRef.current || roofPolygon;
     if (activePoly && activePoly.length >= 3) {
       ctx.save();
@@ -637,32 +564,23 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         ctx.lineTo(pt.x, pt.y);
       }
       ctx.closePath();
-
-      // HelioScope CAD Light Blue Translucent Area Fill
       ctx.fillStyle = "rgba(56, 189, 248, 0.08)";
       ctx.fill();
-
-      // HelioScope CAD Sky Blue Dashed Boundary Line
       ctx.strokeStyle = "#38bdf8";
       ctx.lineWidth = 2;
       ctx.setLineDash([4, 4]);
       ctx.stroke();
-
-      // Setback Clearance dashed guide (if setbackMeters > 0)
       if (setbackMeters > 0) {
         ctx.strokeStyle = "rgba(56, 189, 248, 0.35)";
         ctx.lineWidth = 1;
         ctx.setLineDash([2, 4]);
         ctx.stroke();
       }
-
-      // Highlight Hovered or Dragged Edge Line with Weight 3.5 & Solid Glow
       const activeEdgeIdx = isDraggingEdgeRef.current ? draggedEdgeIndexRef.current : hoveredEdgeIndexRef.current;
       if (activeEdgeIdx >= 0 && activeEdgeIdx < activePoly.length) {
         const nextIdx = (activeEdgeIdx + 1) % activePoly.length;
         const pt1 = toPx(activePoly[activeEdgeIdx][0], activePoly[activeEdgeIdx][1]);
         const pt2 = toPx(activePoly[nextIdx][0], activePoly[nextIdx][1]);
-
         ctx.save();
         ctx.beginPath();
         ctx.moveTo(pt1.x, pt1.y);
@@ -675,13 +593,10 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         ctx.stroke();
         ctx.restore();
       }
-
-      // Render Draggable Vertex Corner Handles for Completed Roof Polygon (HelioScope CAD standard)
       for (let i = 0; i < activePoly.length; i++) {
         const vPt = toPx(activePoly[i][0], activePoly[i][1]);
         const isHovered = (i === hoveredVertexIndexRef.current);
         const isDragged = (isDraggingVertexRef.current && i === draggedVertexIndexRef.current);
-
         ctx.save();
         ctx.beginPath();
         const r = isDragged ? 7.5 : (isHovered ? 6.5 : 5);
@@ -695,18 +610,13 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         ctx.stroke();
         ctx.restore();
       }
-
       ctx.restore();
     }
 
-    // -------------------------------------------------------------
-    // B. IN-PROGRESS FIELD SEGMENT DRAWING (Yellow Outline + Handles)
-    // -------------------------------------------------------------
+    // B. IN-PROGRESS FIELD SEGMENT DRAWING
     const activePoints = activePolyPointsRef.current;
     if ((activeCadTool === "FIELD_SEGMENT" || activeCadTool === "ROOF_PERIMETER") && activePoints.length > 0) {
       ctx.save();
-
-      // Draw lines between existing vertices
       ctx.beginPath();
       const firstPx = toPx(activePoints[0][0], activePoints[0][1]);
       ctx.moveTo(firstPx.x, firstPx.y);
@@ -714,18 +624,13 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         const pt = toPx(activePoints[i][0], activePoints[i][1]);
         ctx.lineTo(pt.x, pt.y);
       }
-
-      // Rubber-band line from last point to current mouse position
       if (mousePosPxRef.current) {
         ctx.lineTo(mousePosPxRef.current.x, mousePosPxRef.current.y);
       }
-
       ctx.strokeStyle = "#facc15";
       ctx.lineWidth = 2.5;
       ctx.setLineDash([6, 3]);
       ctx.stroke();
-
-      // Vertex anchor handles with step numbers
       activePoints.forEach(([lat, lng], idx) => {
         const vPx = toPx(lat, lng);
         ctx.beginPath();
@@ -735,7 +640,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 2;
         ctx.stroke();
-
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 9px sans-serif";
         ctx.textAlign = "center";
@@ -743,8 +647,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         ctx.fillText(`${idx + 1}`, vPx.x, vPx.y);
         ctx.textAlign = "start";
       });
-
-      // Snapping to first point visual indicator
       if (isNearFirstPoint && activePoints.length >= 3) {
         ctx.beginPath();
         ctx.arc(firstPx.x, firstPx.y, 14, 0, Math.PI * 2);
@@ -752,13 +654,10 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         ctx.lineWidth = 2;
         ctx.setLineDash([3, 3]);
         ctx.stroke();
-
         ctx.fillStyle = "#10b981";
         ctx.font = "bold 10px sans-serif";
         ctx.fillText("Click to close field segment", firstPx.x + 18, firstPx.y + 4);
       }
-
-      // Edge length measurement label next to mouse cursor
       if (mouseGpsRef.current && activePoints.length > 0) {
         const lastPt = activePoints[activePoints.length - 1];
         const segDistM = distanceBetweenGps(lastPt, [mouseGpsRef.current.lat, mouseGpsRef.current.lng]);
@@ -775,27 +674,21 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           ctx.fillText(badgeText, mousePosPxRef.current.x + 18, mousePosPxRef.current.y - 7);
         }
       }
-
       ctx.restore();
     }
 
-    // -------------------------------------------------------------
-    // C. TWO-CLICK SNAP BOX ARRAY PREVIEW
-    // -------------------------------------------------------------
+    // C. TWO-CLICK SNAP BOX PREVIEW
     if (activeCadTool === "ROOF_BOX" && p1Ref.current && mouseGpsRef.current) {
       const p1 = p1Ref.current;
       const p2 = mouseGpsRef.current;
-
       const minLat = Math.min(p1.lat, p2.lat);
       const maxLat = Math.max(p1.lat, p2.lat);
       const minLng = Math.min(p1.lng, p2.lng);
       const maxLng = Math.max(p1.lng, p2.lng);
-
       const tl = toPx(maxLat, minLng);
       const tr = toPx(maxLat, maxLng);
       const br = toPx(minLat, maxLng);
       const bl = toPx(minLat, minLng);
-
       ctx.save();
       ctx.beginPath();
       ctx.moveTo(tl.x, tl.y);
@@ -812,9 +705,24 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       ctx.restore();
     }
 
-    // -------------------------------------------------------------
-    // D. PHOTOVOLTAIC SOLAR MODULES MATRIX RENDERING (Photorealistic Half-Cut)
-    // -------------------------------------------------------------
+    // ★ SnapBox: pehli click ka visible orange dot marker (sirf ROOF_BOX tool pe)
+    if (activeCadTool === "ROOF_BOX" && p1Ref.current) {
+      const p1px = toPx(p1Ref.current.lat, p1Ref.current.lng);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(p1px.x, p1px.y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = "#f59e0b";
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = "bold 10px sans-serif";
+      ctx.fillText("Start — ab dusri corner pe click karo", p1px.x + 12, p1px.y - 10);
+      ctx.restore();
+    }
+
+    // D. PHOTOVOLTAIC MODULES MATRIX
     const currentRoofPoly = (activePolygon && activePolygon.length >= 3)
       ? activePolygon
       : (activePoly && activePoly.length >= 3 ? activePoly : null);
@@ -841,10 +749,8 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     const deltaLat = isDraggingArrayRef.current ? (dragDeltaGpsRef.current?.lat || 0) : 0;
     const deltaLng = isDraggingArrayRef.current ? (dragDeltaGpsRef.current?.lng || 0) : 0;
 
-    // Roof Centroid GPS Anchor
     const roofCentroidGps = hasValidRoof ? calculateCentroid(currentRoofPoly) : null;
 
-    // 1. Always calculate the roof polygon centroid safely:
     const getPolygonCentroid = (pts) => {
       if (!pts || pts.length === 0) return { x: 0, y: 0 };
       let sx = 0, sy = 0;
@@ -864,7 +770,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       centerPoint = { x: width / 2, y: height / 2 };
     }
 
-    // Map scale: pixels per meter around roof centroid
     let scale = 18;
     if (map && roofCentroidGps) {
       try {
@@ -878,7 +783,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       } catch (e) { }
     }
 
-    // Track array bounding box in pixel space for free-drag hit detection
     let bboxMinX = Infinity, bboxMaxX = -Infinity, bboxMinY = Infinity, bboxMaxY = -Infinity;
 
     const preparedPanels = [];
@@ -892,7 +796,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       const baseScale = Number(scale) || 1;
       const s = (typeof arrayScale === 'number' && isFinite(arrayScale) && arrayScale > 0.2) ? arrayScale : 1.0;
 
-      // Keep Individual Module Dimensions Fixed & Prevent NaN or collapsing dimensions
       const isLandscape = p.orientation === "LANDSCAPE" || orientation === "LANDSCAPE";
       const baseW = isLandscape ? 2.278 : 1.134;
       const baseL = isLandscape ? 1.134 : 2.278;
@@ -904,10 +807,8 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       const pWidth = visualWidth;
       const pLength = visualLength;
 
-      // Local relative offset from roof centroid (rotX, rotY in screen pixels)
       let rotX = 0;
       let rotY = 0;
-
       const modCenter = mod.center || mod.centerGps;
       let hasCenterPx = false;
       if (modCenter) {
@@ -926,7 +827,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       if (!hasCenterPx) {
         if (mod.rotX !== undefined && mod.rotY !== undefined && isFinite(mod.rotX) && isFinite(mod.rotY)) {
           rotX = (Number(mod.rotX) || 0) * scale;
-          rotY = -(Number(mod.rotY) || 0) * scale; // World Northing (Y+) corresponds to Canvas Y-
+          rotY = -(Number(mod.rotY) || 0) * scale;
         } else if (mod.relX !== undefined && mod.relY !== undefined && isFinite(mod.relX) && isFinite(mod.relY)) {
           rotX = (Number(mod.relX) || 0) * scale;
           rotY = -(Number(mod.relY) || 0) * scale;
@@ -936,11 +837,9 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       if (rotX === undefined || !isFinite(rotX) || isNaN(rotX)) rotX = 0;
       if (rotY === undefined || !isFinite(rotY) || isNaN(rotY)) rotY = 0;
 
-      // Adjust relative offsets between plates, keeping module glass size 100% natural
       let px = centerPoint.x + (rotX * s);
       let py = centerPoint.y + (rotY * s);
 
-      // Apply drag delta if array is being translated
       if (deltaLat !== 0 || deltaLng !== 0) {
         const dPx = toPx(
           (roofCentroidGps?.lat ?? 0) + deltaLat,
@@ -956,7 +855,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       const finalPx = px;
       const finalPy = py;
 
-      // Azimuth rotation vector in screen pixels
       const azDeg = Number(mod.azimuth !== undefined ? mod.azimuth : azimuthDegrees) || 180;
       const azRad = ((azDeg - 180) * Math.PI) / 180;
       const cosAz = Math.cos(azRad);
@@ -972,7 +870,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         { x: finalPx - hw.x + hl.x, y: finalPy - hw.y + hl.y }
       ];
 
-      // Update bbox from all panel visual corners
       visualCornersPx.forEach(p => {
         if (p.x < bboxMinX) bboxMinX = p.x;
         if (p.x > bboxMaxX) bboxMaxX = p.x;
@@ -997,24 +894,20 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     });
 
     try {
-      // PASS 1: RACKING STRUCTURES, FOUNDATION LEGS & DROP SHADOWS UNDERNEATH (All modules)
+      // PASS 1: RACKING + AMBIENT SHADOWS
       preparedPanels.forEach(({ cornersPx, isRemoved, modRackingType }) => {
         if (isRemoved) return;
-
-        // Ambient Occlusion Drop Shadow proportional to tilt angle
         if (showShadows) {
           const effElev = timeSimRef.current ? simSunRef.current.elevationDeg : solarElevation;
           const effAzim = timeSimRef.current ? simSunRef.current.azimuthDeg : solarAzimuth;
           const elevRad = (Math.max(5, effElev) * Math.PI) / 180;
           const azRad = (effAzim * Math.PI) / 180;
-          // Tilt-scaled shadow — deeper tilt casts a more pronounced row shadow
           const tiltFactor = Math.sin((tiltDegrees * Math.PI) / 180);
           const shadowDistPx = Math.min(12, Math.max(2, (3 + tiltFactor * 6) / Math.tan(elevRad)));
           const shadowVec = {
             x: -Math.sin(azRad) * shadowDistPx,
             y: Math.cos(azRad) * shadowDistPx
           };
-
           ctx.save();
           ctx.beginPath();
           ctx.moveTo(cornersPx[0].x + shadowVec.x, cornersPx[0].y + shadowVec.y);
@@ -1026,13 +919,14 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           ctx.fill();
           ctx.restore();
         }
-
-        // Render physical galvanized mounting legs and cross-beams underneath panels based on rackingType
         renderRackingUnderneath(ctx, cornersPx, modRackingType, showShadows);
       });
 
-      // PASS 2: PHOTOVOLTAIC SOLAR MODULE FACES & DYNAMIC SUN SHADOWS (Rendered on top)
+      // PASS 2: MODULE FACES + DYNAMIC SUN SHADOWS
       preparedPanels.forEach(({ mod, drawX, drawY, pW, pL, pLengthM, tiltRad: panelTiltRad, azRad, isRemoved, isHovered, modRackingType }) => {
+        // ★ FIX CRASH: non-finite panel dimensions par createLinearGradient throw
+        // karta tha ("non-finite double value" Safeguard error) — ab broken panel skip
+        if (!isFinite(drawX) || !isFinite(drawY) || !isFinite(pW) || !isFinite(pL) || pW <= 0.1 || pL <= 0.1) return;
         if (isRemoved) {
           ctx.save();
           ctx.translate(drawX, drawY);
@@ -1046,27 +940,25 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           return;
         }
 
-        // 1. Dynamic Sun Position Shadow Projection (rendered under the panel)
         if (showShadows) {
-          // Get active sun altitude & azimuth (default: Jun 21 solar noon if not selected)
           const sunAlt = timeSimRef.current ? Math.max(5, simSunRef.current.elevationDeg) : Math.max(5, Number(sunAltitudeDeg ?? solarElevation ?? 45));
           const sunAz = timeSimRef.current ? simSunRef.current.azimuthDeg : Number(sunAzimuthDeg ?? solarAzimuth ?? 180);
 
-          // Shadow length depends on panel elevation/tilt and sun angle:
           const effLength = Number(pLengthM) || 2.278;
           const effTiltRad = Number(panelTiltRad) || 0;
           const shadowLengthMeters = (effLength * Math.sin(effTiltRad) + (modRackingType === 'L3_ELEVATED' ? 1.5 : 0.8)) / Math.tan((sunAlt * Math.PI) / 180);
-          const shadowPx = shadowLengthMeters * scale;
+          // ★ FIX STRETCH: sunset (18:00) pe sun neecha → shadow physically 30m+ lambi
+          // thi jo lines ki tarah stretch dikhti thi — ab 140px pe cap hai
+          const simBoost = timeSimRef.current ? 2.2 : 1;
+          const shadowPx = Math.min(shadowLengthMeters * scale * simBoost, 140);
 
-          // Shadow direction is opposite to sun azimuth:
           const shadowAngleRad = ((sunAz + 180) * Math.PI) / 180;
           const shadowDx = Math.sin(shadowAngleRad) * shadowPx;
           const shadowDy = -Math.cos(shadowAngleRad) * shadowPx;
 
-          // Draw semi-transparent shadow under the panel
           ctx.save();
           ctx.translate(drawX, drawY);
-          ctx.fillStyle = "rgba(15, 23, 42, 0.42)";
+          ctx.fillStyle = timeSimRef.current ? "rgba(15, 23, 42, 0.5)" : "rgba(15, 23, 42, 0.42)";
           ctx.beginPath();
           ctx.moveTo(-pW / 2, -pL / 2);
           ctx.lineTo(pW / 2, -pL / 2);
@@ -1077,17 +969,15 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           ctx.restore();
         }
 
-        // 2. ★ REALISTIC solar module: silver frame + cell grid + busbars + glass shine
+        // ★ REALISTIC module: frame + cell grid + busbars + glass shine
         ctx.save();
         ctx.translate(drawX, drawY);
         ctx.rotate(azRad);
 
-        // A) Anodized aluminium frame (silver border)
         const frameW = Math.max(0.8, Math.min(2.2, pW * 0.05));
         ctx.fillStyle = "#9ca3af";
         ctx.fillRect(-pW / 2, -pL / 2, pW, pL);
 
-        // B) Dark blue tempered glass (gradient depth)
         const glassGrad = ctx.createLinearGradient(-pW / 2, -pL / 2, pW / 2, pL / 2);
         if (isHovered) {
           glassGrad.addColorStop(0, "#1e40af");
@@ -1100,7 +990,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         ctx.fillStyle = glassGrad;
         ctx.fillRect(-pW / 2 + frameW, -pL / 2 + frameW, pW - frameW * 2, pL - frameW * 2);
 
-        // C) Half-cut cell grid + busbars (sirf jab panel kaafi bara ho)
         const innerW = pW - frameW * 2, innerL = pL - frameW * 2;
         if (innerW > 10 && innerL > 10) {
           const isWide = innerW > innerL;
@@ -1115,7 +1004,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           for (let r = 1; r < rows; r++) { const y = -innerL / 2 + r * ch; ctx.moveTo(-innerW / 2, y); ctx.lineTo(innerW / 2, y); }
           ctx.stroke();
 
-          // 2 busbars per cell (thin light lines)
           ctx.strokeStyle = "rgba(191,219,254,0.20)";
           ctx.lineWidth = 0.4;
           ctx.beginPath();
@@ -1126,7 +1014,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           }
           ctx.stroke();
 
-          // D) Glass specular shine (diagonal reflection)
           ctx.fillStyle = "rgba(255,255,255,0.08)";
           ctx.beginPath();
           ctx.moveTo(-innerW / 2, -innerL / 2);
@@ -1136,12 +1023,10 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           ctx.fill();
         }
 
-        // E) Outline
         ctx.strokeStyle = isHovered ? "#93c5fd" : "rgba(56,189,248,0.55)";
         ctx.lineWidth = 1;
         ctx.strokeRect(-pW / 2, -pL / 2, pW, pL);
 
-        // If elevated racking (L2 / L3) is enabled, render leg drops straight down
         if (modRackingType === 'L2_ELEVATED' || modRackingType === 'L3_ELEVATED') {
           ctx.fillStyle = "#94a3b8";
           const legH = modRackingType === 'L3_ELEVATED' ? 14 : 8;
@@ -1155,19 +1040,13 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       console.warn("[HelioScopeCAD] drawScene pass rendering error:", renderErr);
     }
 
-    // Store array bounding box for free-drag hit detection
     if (panels.length > 0 && isFinite(bboxMinX)) {
       arrayBboxPxRef.current = { minX: bboxMinX, maxX: bboxMaxX, minY: bboxMinY, maxY: bboxMaxY };
     } else {
       arrayBboxPxRef.current = null;
     }
 
-    // All intrusive badges, bounding boxes, and gizmo overlays permanently removed.
-    // Module statistics are displayed cleanly in the left CAD sidebar.
-
-    // -------------------------------------------------------------
-    // E. DRAGGABLE ARRAY ANCHOR GIZMO (Center Control Handle)
-    // -------------------------------------------------------------
+    // E. ARRAY ANCHOR (drag coordinates)
     if (panels.length > 0 && roofPolygon && roofPolygon.length >= 3) {
       let sumModLat = 0, sumModLng = 0, validModCount = 0;
       panels.forEach(p => {
@@ -1188,31 +1067,20 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           }
         });
       }
-
       const roofCentroid = calculateCentroid(roofPolygon);
       const rLat = roofCentroid.lat ?? (Array.isArray(roofCentroid) ? roofCentroid[0] : 0);
       const rLng = roofCentroid.lng ?? (Array.isArray(roofCentroid) ? roofCentroid[1] : 0);
-
       const centroidLat = validModCount > 0 ? (sumModLat / validModCount) : rLat;
       const centroidLng = validModCount > 0 ? (sumModLng / validModCount) : rLng;
-
       const aLat = centroidLat + (deltaLat || 0);
       const aLng = centroidLng + (deltaLng || 0);
       const aPx = toPx(aLat, aLng);
       anchorPxRef.current = aPx;
-
-      // Removed on-canvas circle gizmo to prevent blocking the solar panels view
-      // Array repositioning is handled cleanly by dragging the array directly
-      if (isFinite(aPx.x) && isFinite(aPx.y)) {
-        // Keep coordinates updated for dragging logic without rendering visual obstruction
-      }
     } else {
       anchorPxRef.current = null;
     }
 
-    // -------------------------------------------------------------
-    // F. KEEPOUT OBSTACLES (HVAC / Water Tanks)
-    // -------------------------------------------------------------
+    // F. KEEPOUT OBSTACLES
     keepouts.forEach((obs) => {
       const centerPx = toPx(obs.lat, obs.lng);
       const edgeGps = [obs.lat, obs.lng + (obs.radiusM / (111320 * Math.cos((obs.lat * Math.PI) / 180)))];
@@ -1230,16 +1098,12 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       ctx.restore();
     });
 
-    // -------------------------------------------------------------
     // G. ELECTRICAL OVERLAY — Inverters, Strings & Lightning Badges
-    // -------------------------------------------------------------
     if (showElectricalLayer && panels.length > 0 && roofPolygon && roofPolygon.length >= 3) {
       ctx.save();
 
-      // Inverter Stations along roof perimeter
       const invRatingKw = inverterCapacityKw || 100;
       const activePanelCount = panels.length - (removedModuleIds ? removedModuleIds.size : 0);
-      // ★ FIX: Ab selected module ki ACTUAL wattage use hoti hai (585 hardcode hat gaya)
       const avgW = panels.reduce((a, p) => a + (Number(p.wattage) || 585), 0) / Math.max(1, panels.length);
       const sysSizeKwp = (activePanelCount * avgW) / 1000;
       const invQty = Math.max(1, Math.ceil(sysSizeKwp / (invRatingKw * 1.25)));
@@ -1322,7 +1186,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         ctx.restore();
       });
 
-      // String groups with lightning bolt badges
       const strSize = Math.max(1, targetStringSize || 20);
       const activePanels = panels.filter(p => !removedModuleIds || !removedModuleIds.has(p.id));
       const strings = [];
@@ -1393,6 +1256,28 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       ctx.restore();
     }
 
+    // H. SUN SIM INDICATOR BADGE (Sim ON hone par upar-right ☀ elevation/azimuth)
+    if (timeSimRef.current) {
+      const bx = width - 150;
+      const by = 14;
+      ctx.save();
+      ctx.fillStyle = "rgba(8,15,30,0.9)";
+      ctx.strokeStyle = "#facc15";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(bx, by, 138, 46, 8);
+      else ctx.rect(bx, by, 138, 46);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#facc15";
+      ctx.font = "bold 11px sans-serif";
+      ctx.fillText(`☀ ${Math.round(simSunRef.current.elevationDeg)}° elev`, bx + 10, by + 18);
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "10px monospace";
+      ctx.fillText(`az ${Math.round(simSunRef.current.azimuthDeg)}°  shadow ⟲ live`, bx + 10, by + 35);
+      ctx.restore();
+    }
+
     ctx.restore();
   }, [
     map,
@@ -1417,6 +1302,12 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     placedPanels
   ]);
   drawSceneRef.current = drawScene;
+
+  // ★ FIX: Tool change par Snap Box ka pehla point clear — warna purana orange
+  // dot galat jagah dikhta rehta hai (keepout/pan switch ke baad bhi)
+  useEffect(() => {
+    p1Ref.current = null;
+  }, [activeCadTool]);
 
   // Map pan/zoom/resize listeners
   useEffect(() => {
@@ -1499,8 +1390,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       azimuth: azimuthDegrees,
       setback: setbackMeters,
       color: "#3b49df",
-      // ★ FIX: AUTO pitch mode mein rowSpacing pass NAHI karo -> engine winter-shadow
-      //   formula se tilt-linked pitch nikalega. Manual mode mein explicit gap jata hai.
       rowSpacing: isAutoPitch ? undefined : rowSpacing,
       rowSpacingM: isAutoPitch ? undefined : rowSpacing,
       colSpacing,
@@ -1521,7 +1410,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       gridOffset,
       keepouts,
       rackingType,
-      latitude: siteLatitude // ★ NEW: site ki latitude se winter sun angle calculate hoga
+      latitude: siteLatitude
     });
 
     if (result && Array.isArray(result.modules) && result.modules.length > 0) {
@@ -1554,7 +1443,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         });
       }
 
-      // Force immediate synchronous Canvas draw
       drawScene();
       requestRedraw();
     }
@@ -1568,7 +1456,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     rowSpacing,
     colSpacing,
     shadowPitch,
-    isAutoPitch, // ★ NEW
+    isAutoPitch,
     arrayScale,
     frameSizeUp,
     frameSizeWide,
@@ -1582,7 +1470,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     gridOffset,
     keepouts,
     rackingType,
-    siteLatitude, // ★ NEW
+    siteLatitude,
     drawScene,
     requestRedraw
   ]);
@@ -1598,8 +1486,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     };
   }, [map]);
 
-  // Native anchor marker disabled to keep panels 100% unobstructed.
-  // Direct mouse drag on panels handles array translation cleanly.
   useEffect(() => {
     if (nativeAnchorMarkerRef.current && map) {
       try {
@@ -1676,7 +1562,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     runModulePackingRef.current = runModulePacking;
   }, [runModulePacking]);
 
-  // Ensure Racking, Azimuth, and Tilt immediately re-pack and re-render panels
+  // Ensure Racking, Azimuth, Tilt immediately re-pack and re-render panels
   useEffect(() => {
     const activePoly = (activePolygon && activePolygon.length >= 3)
       ? activePolygon
@@ -1698,7 +1584,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       return;
     }
 
-    // 1. Sanitize input parameters with safe defaults
     const currentAzimuth = typeof azimuthDegrees === "number" && !isNaN(azimuthDegrees)
       ? azimuthDegrees
       : (Number.isFinite(Number(azimuthDegrees)) ? Number(azimuthDegrees) : 180);
@@ -1707,7 +1592,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       : (Number.isFinite(Number(tiltDegrees)) ? Number(tiltDegrees) : 18);
     const currentRacking = rackingType || "L2_ELEVATED";
 
-    // 2. Centroid reference for metric/GPS projection
     const centroid = calculateCentroid(activePoly);
     const cLat = Array.isArray(centroid) ? centroid[0] : (centroid?.lat || 0);
     const cLng = Array.isArray(centroid) ? centroid[1] : (centroid?.lng || 0);
@@ -1718,15 +1602,9 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     const moduleWidth = orientation === "PORTRAIT" ? widthM : lengthM;
     const moduleLength = orientation === "PORTRAIT" ? lengthM : widthM;
 
-    // 3. Re-calculate modules with fresh settings using packModulesOnRoof
     const updatedPanels = packModulesOnRoof(activePoly, {
       orientation,
       arrayScale,
-      // ★ FIX (ASLI TILT BUG YAHAN THA): pehle yahan hardcoded
-      //   `shadowPitch: Number(shadowPitch || rowSpacing) || 1.55` ja raha tha,
-      //   jiski wajah se tilt-linked winter-shadow pitch KABHI trigger nahi hoti thi.
-      //   Ab AUTO mode mein rowSpacing/shadowPitch undefined jata hai -> engine
-      //   calculateWinterShadowSpacing() se tilt+latitude linked pitch nikalta hai.
       shadowPitch: shadowPitch ?? undefined,
       rowSpacing: isAutoPitch ? undefined : rowSpacing,
       rowSpacingM: isAutoPitch ? undefined : rowSpacing,
@@ -1756,13 +1634,12 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       gridOffset,
       keepouts,
       wattage: spec.wattage,
-      latitude: siteLatitude, // ★ NEW: winter sun angle ke liye site latitude
+      latitude: siteLatitude,
       refLat: cLat,
       refLng: cLng,
       centroid: { lat: cLat, lng: cLng }
     });
 
-    // 4. Update panel state and ref
     if (updatedPanels && updatedPanels.length > 0) {
       const formatted = updatedPanels.map((m, idx) => ({
         id: m.id || `mod-${idx}`,
@@ -1808,11 +1685,9 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         });
       }
     } else if (cachedPanelsRef.current && cachedPanelsRef.current.length > 0) {
-      // If adjusting the scale ever causes the active panels count to become 0, keep displaying the previous array at the new scale so panels NEVER turn invisible
       panelsRef.current = cachedPanelsRef.current;
     }
 
-    // 5. Force canvas repaint immediately
     if (typeof renderCanvas === "function") {
       renderCanvas();
     } else if (typeof requestRedraw === "function") {
@@ -1841,7 +1716,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     setbackMeters,
     rowSpacing,
     shadowPitch,
-    isAutoPitch, // ★ NEW: pitch mode toggle bhi repack trigger kare
+    isAutoPitch,
     arrayScale,
     colSpacing,
     frameSizeUp,
@@ -1853,7 +1728,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     targetKwP,
     gridOffset,
     keepouts,
-    siteLatitude, // ★ NEW
+    siteLatitude,
     renderCanvas,
     requestRedraw,
     onArrayCalculated,
@@ -1868,7 +1743,8 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     return Math.hypot(px - (x1 + t * (x2 - x1)), py - (y1 + t * (y2 - y1)));
   };
 
-  const findClosestRoofEdge = (clickPx) => {
+  // ★ FIX EDGE-ALIGN: optional wide hit radius (contextmenu 42px, drag 28px)
+  const findClosestRoofEdge = (clickPx, maxDistPx = 28) => {
     const activePoly = activePolyDragRef.current || roofPolygon;
     if (!activePoly || activePoly.length < 3) return null;
     let closestEdge = null;
@@ -1880,7 +1756,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       const pt2 = toPx(activePoly[nextIdx][0], activePoly[nextIdx][1]);
 
       const dist = pointToSegmentDistPx(clickPx.x, clickPx.y, pt1.x, pt1.y, pt2.x, pt2.y);
-      if (dist < minDist && dist < 28) {
+      if (dist < minDist && dist < maxDistPx) {
         minDist = dist;
 
         const lat1 = activePoly[i][0], lng1 = activePoly[i][1];
@@ -1904,7 +1780,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   };
 
   // =========================================================================
-  // 4. MOUSE EVENT HANDLERS & INTERACTIVE VERTEX / EDGE DRAGGING ENGINE
+  // 4. MOUSE EVENT HANDLERS
   // =========================================================================
   const handleWheel = (e) => {
     if (!map) return;
@@ -1925,7 +1801,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   const handleMouseDown = (e) => {
     if (!map) return;
 
-    if (e.button === 0) { // Left-click
+    if (e.button === 0) {
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
       const mouseX = e.clientX - rect.left;
@@ -1933,8 +1809,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
 
       const activePoly = activePolyDragRef.current || roofPolygon;
 
-      // ★ NEW: LOCK GUARD — Lock ON hone par vertex/edge/array drag band,
-      // lekin map panning (Case 4) free chalti hai.
+      // ★ LOCK GUARD
       if (effLock) {
         isDraggingMapRef.current = true;
         hasDraggedRef.current = false;
@@ -1943,7 +1818,17 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         return;
       }
 
-      // 1. DIRECT VERTEX CORNER DRAGGING (Priority #1: within 18px of any corner handle)
+      // ★ FIX PAN MAP: PAN_VIEW mein vertex/edge/array hit-tests SKIP —
+      // hamesha seedha map pan (pehle edges ke paas drag se edge-drag ho jata tha)
+      if (activeCadTool === "PAN_VIEW") {
+        isDraggingMapRef.current = true;
+        hasDraggedRef.current = false;
+        dragStartRef.current = { x: e.clientX, y: e.clientY };
+        if (canvasRef.current) canvasRef.current.style.cursor = "grabbing";
+        return;
+      }
+
+      // 1. VERTEX DRAGGING
       if (activePoly && activePoly.length >= 3) {
         let hitVertexIdx = -1;
         for (let i = 0; i < activePoly.length; i++) {
@@ -1958,7 +1843,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         if (hitVertexIdx !== -1) {
           e.stopPropagation();
           if (e.cancelable) e.preventDefault();
-          if (map.dragging) map.dragging.disable(); // Stop Leaflet map pan while moving corner
+          if (map.dragging) map.dragging.disable();
           isDraggingVertexRef.current = true;
           draggedVertexIndexRef.current = hitVertexIdx;
           dragStartRoofPolyRef.current = activePoly.map(pt => [...pt]);
@@ -1969,9 +1854,9 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         }
       }
 
-      if (isDrawing) return; // Active drawing modes use handleClick / handleDoubleClick
+      if (isDrawing) return;
 
-      // 2. EDGE SHIFTING (Priority #2: within 18px of an edge)
+      // 2. EDGE SHIFTING
       const edge = findClosestRoofEdge({ x: mouseX, y: mouseY });
       if (edge && edge.dist <= 18 && activePoly && activePoly.length >= 3) {
         e.stopPropagation();
@@ -1988,7 +1873,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         return;
       }
 
-      // 3. ARRAY DRAGGING (★ NEW: Move Mode (✥) ya isAdjustingPosition ON ho tabhi)
+      // 3. ARRAY DRAGGING (Move Mode ON ho tabhi)
       const isAnchorHit = moveActive && anchorPxRef.current && panelsRef.current.length > 0 &&
         Math.hypot(mouseX - anchorPxRef.current.x, mouseY - anchorPxRef.current.y) < 26;
 
@@ -2015,7 +1900,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         return;
       }
 
-      // 4. MAP PANNING ON EMPTY CANVAS (Smooth, non-blocking drag)
+      // 4. MAP PANNING ON EMPTY CANVAS
       isDraggingMapRef.current = true;
       hasDraggedRef.current = false;
       dragStartRef.current = { x: e.clientX, y: e.clientY };
@@ -2034,9 +1919,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     const gps = toGps(mouseX, mouseY);
     if (gps) mouseGpsRef.current = gps;
 
-    // -------------------------------------------------------------
-    // CASE A: DRAGGING CORNER VERTEX HANDLE (Highest Priority)
-    // -------------------------------------------------------------
+    // CASE A: VERTEX DRAG
     if (isDraggingVertexRef.current && draggedVertexIndexRef.current !== -1) {
       const vIdx = draggedVertexIndexRef.current;
       const curGps = toGps(mouseX, mouseY);
@@ -2057,9 +1940,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       return;
     }
 
-    // -------------------------------------------------------------
-    // CASE B: DRAGGING EDGE LINE (Parallel Normal Shift)
-    // -------------------------------------------------------------
+    // CASE B: EDGE DRAG
     if (isDraggingEdgeRef.current && dragStartMouseGpsRef.current && dragStartRoofPolyRef.current) {
       const curGps = toGps(mouseX, mouseY);
       const startGps = dragStartMouseGpsRef.current;
@@ -2080,9 +1961,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       return;
     }
 
-    // -------------------------------------------------------------
-    // CASE C: DRAGGING ARRAY OFFSET (Translation)
-    // -------------------------------------------------------------
+    // CASE C: ARRAY DRAG
     if (isDraggingArrayRef.current) {
       const dxPx = e.clientX - dragStartScreenPxRef.current.x;
       const dyPx = e.clientY - dragStartScreenPxRef.current.y;
@@ -2108,9 +1987,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       return;
     }
 
-    // -------------------------------------------------------------
-    // CASE D: DRAGGING EMPTY CANVAS TO PAN MAP
-    // -------------------------------------------------------------
+    // CASE D: MAP PAN
     if (isDraggingMapRef.current) {
       const dx = e.clientX - dragStartRef.current.x;
       const dy = e.clientY - dragStartRef.current.y;
@@ -2121,9 +1998,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       return;
     }
 
-    // -------------------------------------------------------------
-    // CASE E: ACTIVE DRAWING (Rubber-band line & snap indicator)
-    // -------------------------------------------------------------
+    // CASE E: ACTIVE DRAWING
     if (isDrawing) {
       const activePoints = activePolyPointsRef.current;
       if ((activeCadTool === "FIELD_SEGMENT" || activeCadTool === "ROOF_PERIMETER") && activePoints.length >= 3) {
@@ -2138,15 +2013,12 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       return;
     }
 
-    // -------------------------------------------------------------
-    // CASE F: HOVER DETECTION & CURSOR FEEDBACK (When not dragging)
-    // -------------------------------------------------------------
+    // CASE F: HOVER DETECTION
     const activePoly = activePolyDragRef.current || roofPolygon;
     let hitVertexIdx = -1;
     let hitEdgeIdx = -1;
 
-    if (activePoly && activePoly.length >= 3 && !effLock) {
-      // 1. Check Vertex Corner Hover (radius <= 18px)
+    if (activePoly && activePoly.length >= 3 && !effLock && activeCadTool !== "PAN_VIEW") {
       for (let i = 0; i < activePoly.length; i++) {
         const vPt = toPx(activePoly[i][0], activePoly[i][1]);
         if (Math.hypot(mouseX - vPt.x, mouseY - vPt.y) <= 18) {
@@ -2154,8 +2026,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           break;
         }
       }
-
-      // 2. Check Edge Hover (if not on vertex)
       if (hitVertexIdx === -1) {
         const edge = findClosestRoofEdge({ x: mouseX, y: mouseY });
         if (edge && edge.dist <= 18) {
@@ -2164,7 +2034,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       }
     }
 
-    // Ensure Leaflet map drag is disabled when cursor touches corner vertices so map pan never interferes with vertex grab
     if (hitVertexIdx !== -1) {
       if (map && map.dragging && map.dragging.enabled()) {
         map.dragging.disable();
@@ -2184,7 +2053,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       requestRedraw();
     }
 
-    // Check Module Hover (for toggle click)
+    // Module hover
     let foundHoverModId = null;
     if (hitVertexIdx === -1 && hitEdgeIdx === -1 && panelsRef.current && panelsRef.current.length > 0) {
       for (const mod of panelsRef.current) {
@@ -2209,10 +2078,9 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       requestRedraw();
     }
 
-    // Apply cursor styling
     if (canvasRef.current) {
       if (hitVertexIdx !== -1) {
-        canvasRef.current.style.cursor = "grab"; // Prompt requirement: "cursor: grab on hover"
+        canvasRef.current.style.cursor = "grab";
       } else if (hitEdgeIdx !== -1) {
         canvasRef.current.style.cursor = "pointer";
       } else if (foundHoverModId) {
@@ -2226,7 +2094,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   };
 
   const handleMouseUp = (e) => {
-    // 1. FINISH VERTEX DRAGGING & IMMEDIATELY RE-PACK MODULES
+    // 1. VERTEX DRAG FINISH
     if (isDraggingVertexRef.current) {
       const finalPoly = activePolyDragRef.current;
       isDraggingVertexRef.current = false;
@@ -2235,7 +2103,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       dragStartRoofPolyRef.current = null;
 
       if (map && map.dragging) {
-        map.dragging.enable(); // Restore Leaflet pan
+        map.dragging.enable();
       }
 
       if (canvasRef.current) {
@@ -2245,14 +2113,14 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       if (finalPoly && finalPoly.length >= 3) {
         if (setRoofPolygon) setRoofPolygon(finalPoly);
         if (runModulePackingRef.current) {
-          runModulePackingRef.current(finalPoly); // Re-pack modules for newly adjusted roof polygon!
+          runModulePackingRef.current(finalPoly);
         }
       }
       requestRedraw();
       return;
     }
 
-    // 2. FINISH EDGE DRAGGING & RE-PACK MODULES
+    // 2. EDGE DRAG FINISH
     if (isDraggingEdgeRef.current) {
       const finalPoly = activePolyDragRef.current || dragStartRoofPolyRef.current;
       isDraggingEdgeRef.current = false;
@@ -2268,7 +2136,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       return;
     }
 
-    // 3. FINISH ARRAY DRAGGING
+    // 3. ARRAY DRAG FINISH
     if (isDraggingArrayRef.current || isDraggingAnchorRef.current) {
       isDraggingArrayRef.current = false;
       isDraggingAnchorRef.current = false;
@@ -2309,7 +2177,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       return;
     }
 
-    // 4. FINISH MAP DRAG
+    // 4. MAP DRAG FINISH
     if (isDraggingMapRef.current) {
       isDraggingMapRef.current = false;
       if (canvasRef.current) {
@@ -2361,6 +2229,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     }
   };
 
+  // ★ FIX EDGE-ALIGN: right-click hit radius 42px (pehle 28 tha — mushkil se pakdta tha)
   const handleContextMenu = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -2370,11 +2239,10 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const edge = findClosestRoofEdge({ x, y });
+    const edge = findClosestRoofEdge({ x, y }, 42);
     if (edge) {
       const snapDeg = Math.round(edge.azimuthDeg);
-      // ★ FIX: Right-click pe foran snap band — azimuth ab SIRF menu option
-      // click par set hoga (handleApplyEdgeAzimuth se). HelioScope behavior.
+      // Azimuth sirf menu option click par apply hoga (handleApplyEdgeAzimuth se)
       setEdgeMenu({
         show: true,
         x: Math.min(x, rect.width - 240),
@@ -2416,7 +2284,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   const handleClick = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    if ((isLocked || localLock) || !map) return; // ★ NEW: localLock bhi clicks guard kare
+    if ((isLocked || localLock) || !map) return;
 
     if (hasDraggedRef.current) {
       hasDraggedRef.current = false;
@@ -2493,12 +2361,14 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           name: "Water Tank / HVAC Keepout"
         });
       }
-      if (setActiveCadTool) setActiveCadTool("MANUAL_INSPECT");
+      // ★ FIX KEEPOUT: tool active rehta hai — multiple keepouts laga sakte ho.
+      // Exit karne ke liye ESC dabao ya dusra tool select karo.
+      requestRedraw();
       return;
     }
 
     if (activeCadTool === "MANUAL_INSPECT") {
-      const edge = findClosestRoofEdge({ x, y });
+      const edge = findClosestRoofEdge({ x, y }, 42);
       if (edge) {
         setEdgeMenu({
           show: true,
@@ -2532,7 +2402,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     }
   };
 
-  // ★ NEW: Floating widget styles (dark glass theme — CAD style)
+  // Floating widget styles (dark glass theme)
   const chipStyle = (active) => ({
     padding: "4px 8px",
     borderRadius: 6,
@@ -2577,7 +2447,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         className="w-full h-full pointer-events-auto"
       />
 
-      {/* ★ NEW: Azimuth Quick Presets (0°-270°) — map ke top-left floating chips */}
+      {/* Azimuth Quick Presets */}
       <div
         style={{
           position: "absolute",
@@ -2621,7 +2491,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         </span>
       </div>
 
-      {/* ★ NEW: Array Lock + Move Mode + Shadow Pitch Mode — map ke top-right */}
+      {/* Lock + Move + Pitch controls */}
       <div
         style={{
           position: "absolute",
@@ -2703,7 +2573,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         )}
       </div>
 
-      {/* Floating Right-Click Roof Edge Alignment Context Menu */}
+      {/* Right-Click Roof Edge Alignment Context Menu */}
       {edgeMenu.show && (
         <div
           style={{ left: edgeMenu.x, top: edgeMenu.y }}

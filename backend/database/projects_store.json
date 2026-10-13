@@ -106,6 +106,66 @@
   "quotations": [],
   "auditLogs": [
     {
+      "id": "aud-1791869180410-v0fh",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Tuesday",
+      "date": "13-Oct-2026",
+      "dateWithDay": "Tuesday, 13-Oct-2026",
+      "time": "10:26:20 AM (PKT)",
+      "pktTimestamp": "Tuesday, 13-Oct-2026 | 10:26:20 AM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-10-13T05:26:20.405Z",
+      "ipAddress": "::1",
+      "signatureHash": "fc26ddf31da4d61849903123b01f77347afd2271efc1de3e2af5a5b42e8d71dc",
+      "details": {
+        "sessionId": "6d58b9ce-dcb5-43d6-bbf4-e813dbeb002d",
+        "loginTimestamp": "2026-10-13T05:26:20.404Z"
+      }
+    },
+    {
+      "id": "aud-1791829843037-kgpa",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Monday",
+      "date": "12-Oct-2026",
+      "dateWithDay": "Monday, 12-Oct-2026",
+      "time": "11:30:43 PM (PKT)",
+      "pktTimestamp": "Monday, 12-Oct-2026 | 11:30:43 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-10-12T18:30:43.037Z",
+      "ipAddress": "::1",
+      "signatureHash": "41e72f54da1de162e76d8a232d097b6eb82013800847117e821b8afc40b4dd7a",
+      "details": {
+        "sessionId": "63afc77f-fed8-448e-8346-e1a6da50c8e6",
+        "loginTimestamp": "2026-10-12T18:30:43.037Z"
+      }
+    },
+    {
+      "id": "aud-1791792544573-qem5",
+      "userId": "usr-super-admin-001",
+      "userName": "Super Admin (GreenTech)",
+      "role": "SUPER_ADMIN",
+      "action": "USER_LOGIN",
+      "dayOfWeek": "Monday",
+      "date": "12-Oct-2026",
+      "dateWithDay": "Monday, 12-Oct-2026",
+      "time": "01:09:04 PM (PKT)",
+      "pktTimestamp": "Monday, 12-Oct-2026 | 01:09:04 PM (PKT)",
+      "year": 2026,
+      "exactTimestamp": "2026-10-12T08:09:04.573Z",
+      "ipAddress": "::1",
+      "signatureHash": "91f6d421d2c3f2a9667bc1aadd91c217e6cf2733b4d528691b5e47438b2bc4e7",
+      "details": {
+        "sessionId": "552bcc30-51e4-4e8b-a847-48781c99b3b6",
+        "loginTimestamp": "2026-10-12T08:09:04.573Z"
+      }
+    },
+    {
       "id": "aud-1791723300449-d8ox",
       "userId": "usr-super-admin-001",
       "userName": "Super Admin (GreenTech)",

@@ -55,12 +55,6 @@ L.Icon.Default.mergeOptions({
 /**
  * ModuleHelioScopeCAD
  * Exact 100% Replication of Official HelioScope (Aurora Solar) CAD Engine & Workflow
- * Features:
- *  1. Field Segment Workflow: Yellow boundary outline, vertex anchors, automatic ray-casting module packing
- *  2. Right-Click Edge Alignment: Context menu on roof boundary lines to align azimuth parallel to building walls
- *  3. Top Floating HelioScope Metrics HUD: System Size, Module Count, Annual Production, PR %, Energy Yield
- *  4. 3D Extrusion & Thermal/LIDAR Irradiance Heatmap in Three.js WebGL (00:16 Demo Feature)
- *  5. Left-Hand "Field Segment" Inspector Panel with full mechanical, tilt, azimuth, and spacing accordion
  */
 export default function ModuleHelioScopeCAD({
   activeProject,
@@ -85,9 +79,8 @@ export default function ModuleHelioScopeCAD({
   const [cachedPanels, setCachedPanels] = useState([]);
 
   // CAD Modes & 3D Three.js Toggle
-  // activeCadTool: 'MANUAL_INSPECT' (default) | 'FIELD_SEGMENT' | 'PAN_VIEW' | 'ROOF_BOX' | 'OBSTACLE_CIRCLE'
   const [activeCadTool, setActiveCadTool] = useState("MANUAL_INSPECT");
-  const [viewportMode, setViewportMode] = useState("2D"); // '2D' or '3D'
+  const [viewportMode, setViewportMode] = useState("2D");
   const is3DMode = viewportMode === "3D";
   const setIs3DMode = (val) => setViewportMode(typeof val === "function" ? (val(viewportMode === "3D") ? "3D" : "2D") : (val ? "3D" : "2D"));
   const isDrawingMode = activeCadTool === "FIELD_SEGMENT" || activeCadTool === "ROOF_BOX" || activeCadTool === "OBSTACLE_CIRCLE";
@@ -106,8 +99,7 @@ export default function ModuleHelioScopeCAD({
   const [visualPlateScale, setVisualPlateScale] = useState(1.0);
   const [showCentroidMarker, setShowCentroidMarker] = useState(false);
 
-  // 2. Roof Boundary Coordinates: Start EMPTY by default unless saved in surveyDetails
-  // (Prevents automatic default array on initial load - user will manually add or click Auto-Fill)
+  // 2. Roof Boundary Coordinates
   const [roofPolygon, setRoofPolygon] = useState(() => {
     const raw = surveyDetails?.roofPolygonJson;
     if (Array.isArray(raw) && raw.length >= 3) return raw;
@@ -130,7 +122,6 @@ export default function ModuleHelioScopeCAD({
     let lat = siteLat || defaultLat;
     let lng = siteLng || defaultLng;
 
-    // Use current map viewport center so panels appear right where the user is looking!
     if (map.current) {
       try {
         const center = map.current.getCenter();
@@ -159,13 +150,10 @@ export default function ModuleHelioScopeCAD({
     if (map.current) {
       try {
         const bounds = L.latLngBounds(newPoly);
-        // animate:false so toPx() has correct coords immediately when canvas renders
         map.current.fitBounds(bounds, { padding: [30, 30], animate: false, maxZoom: 21 });
-        // Enforce minimum zoom 19 — below this, individual panel rectangles are sub-pixel
         if (map.current.getZoom() < 19) {
           map.current.setZoom(19, { animate: false });
         }
-        console.log("[Auto-Fill] Map centered. Zoom:", map.current.getZoom());
       } catch (err) {
         console.warn("fitBounds error:", err);
       }
@@ -180,10 +168,10 @@ export default function ModuleHelioScopeCAD({
   // 4. Array Layout Settings (HelioScope Left Accordion State)
   const [selectedModuleKey, setSelectedModuleKey] = useState("Jinko Solar Tiger Neo 585W");
   const [rackingType, setRackingType] = useState("Fixed Tilt / Flush Mount");
-  const [orientation, setOrientation] = useState("PORTRAIT"); // 'PORTRAIT' | 'LANDSCAPE'
+  const [orientation, setOrientation] = useState("PORTRAIT");
   const [tiltDegrees, setTiltDegrees] = useState(18);
-  const [azimuthDegrees, setAzimuthDegrees] = useState(180); // 180° = True South
-  const [setbackMeters, setSetbackMeters] = useState(0.5); // 0.5m parapet clearance
+  const [azimuthDegrees, setAzimuthDegrees] = useState(180);
+  const [setbackMeters, setSetbackMeters] = useState(0.5);
 
   // HelioScope Mechanical Controls & Racking State
   const [frameSizeUp, setFrameSizeUp] = useState(1);
@@ -191,28 +179,28 @@ export default function ModuleHelioScopeCAD({
   const [rowSpacingM, setRowSpacingM] = useState(0.65);
   const [moduleSpacingM, setModuleSpacingM] = useState(0.025);
   const [frameSpacingM, setFrameSpacingM] = useState(0.0);
-  const [gridAlignment, setGridAlignment] = useState("CENTER"); // 'LEFT' | 'CENTER' | 'RIGHT' | 'JUSTIFY'
+  const [gridAlignment, setGridAlignment] = useState("CENTER");
   const [arrayScale, setArrayScale] = useState(1.0);
   const [clearTrigger, setClearTrigger] = useState(0);
 
   // Target Capacity & Draggable Array Anchor State
-  const [targetCapacityMode, setTargetCapacityMode] = useState("AUTO_FIT"); // "AUTO_FIT" | "TARGET_CAP"
-  const [targetKwp, setTargetKwp] = useState(35); // Target capacity in kWp
-  const [gridOffset, setGridOffset] = useState({ x: 0, y: 0 }); // Array anchor offset { x, y } in meters
-  const [isAdjustingPosition, setIsAdjustingPosition] = useState(false); // Interactive drag array position toggle
+  const [targetCapacityMode, setTargetCapacityMode] = useState("AUTO_FIT");
+  const [targetKwp, setTargetKwp] = useState(35);
+  const [gridOffset, setGridOffset] = useState({ x: 0, y: 0 });
+  const [isAdjustingPosition, setIsAdjustingPosition] = useState(false);
 
   // Electrical Layer toggle (strings/inverters overlay)
   const [showElectricalLayer, setShowElectricalLayer] = useState(false);
 
   // 5. Sun Shadow Simulator States
   const [solarHour, setSolarHour] = useState(12.0);
-  const [dayOfYear, setDayOfYear] = useState(355); // Winter Solstice Dec 21st
+  const [dayOfYear, setDayOfYear] = useState(355);
   const [showShadows, setShowShadows] = useState(true);
 
   // 6. Manual Module Edits (Removed module IDs)
   const [removedModuleIds, setRemovedModuleIds] = useState(new Set());
 
-  // 7. Active Tab for CAD details: 'LAYOUT' | 'SHADOWS' | 'STRINGING' | 'LOSS_TREE' | 'SLD'
+  // 7. Active Tab
   const [cadSubTab, setCadSubTab] = useState("LAYOUT");
 
   // Local debounced slider states for zero main-thread lag
@@ -387,7 +375,7 @@ export default function ModuleHelioScopeCAD({
     return () => ro.disconnect();
   }, [mapReady]);
 
-  // Leaflet Invalidate Size Fix: Forces satellite tiles to cover 100% of the box without black dead zones
+  // Leaflet Invalidate Size Fix
   useEffect(() => {
     if (!map.current) return;
     const t1 = setTimeout(() => map.current?.invalidateSize(), 50);
@@ -465,7 +453,7 @@ export default function ModuleHelioScopeCAD({
     }
   }, [setCapacityKw]);
 
-  // Ensure Racking, Azimuth, Tilt, Orientation & Pitch in ModuleHelioScopeCAD immediately keep cachedPanels in sync
+  // Ensure Racking, Azimuth, Tilt, Orientation & Pitch stay in sync (parent mirror)
   useEffect(() => {
     if (!roofPolygon || roofPolygon.length < 3) {
       setCachedPanels([]);
@@ -522,8 +510,6 @@ export default function ModuleHelioScopeCAD({
       centroid: { lat: cLat, lng: cLng }
     });
 
-    // If calculation produces valid panels, update cached state.
-    // If the new calculation ever returns an empty array, retain previous valid panels so modules never turn invisible on click.
     if (updated && updated.length > 0) {
       setCachedPanels(updated);
       setSystemStats({
@@ -576,11 +562,19 @@ export default function ModuleHelioScopeCAD({
   const TIER1_INVERTERS = inverterOptions;
 
   // ★ AUTO INVERTER MATCH: system kWp ke hisab se best inverter (ratio ~1.25)
+  // ★ TDZ-SAFE FIX: activeKwp ko directly use NAHI karta (wo neeche declare hota hai —
+  //   pehle yahi TDZ crash de raha tha). Same value inline calculate karta hai —
+  //   sab inputs (systemStats, cachedPanels, removedModuleIds, selectedModuleKey)
+  //   is jagah se UPAR declared hain, isliye koi TDZ nahi.
   const userOverrodeInverterRef = useRef(false);
   useEffect(() => {
     if (userOverrodeInverterRef.current) return;
-    if (!activeKwp || activeKwp <= 0) return;
-    const targetAcKw = activeKwp / 1.25;
+    const total = systemStats.modulesCount || cachedPanels.length || 0;
+    const activeCount = Math.max(0, total - (removedModuleIds?.size || 0));
+    if (!activeCount || activeCount <= 0) return;
+    const spec = MODULE_PHYSICAL_SPECS[selectedModuleKey] || MODULE_PHYSICAL_SPECS["Jinko Solar Tiger Neo 585W"];
+    const currentKwp = Math.round(((activeCount * (spec?.wattage || 585)) / 1000) * 10) / 10;
+    const targetAcKw = currentKwp / 1.25;
     let best = null, bestDiff = Infinity;
     inverterOptions.forEach(o => {
       const diff = Math.abs(o.kw - targetAcKw);
@@ -590,7 +584,7 @@ export default function ModuleHelioScopeCAD({
       setSelectedInverterModel(best.value);
       setInverterCapacityKw(best.kw);
     }
-  }, [activeKwp, inverterOptions, selectedInverterModel]);
+  }, [systemStats.modulesCount, cachedPanels.length, removedModuleIds, selectedModuleKey, inverterOptions, selectedInverterModel]);
 
   // Target string size (panels per string) for electrical overlay
   const [targetStringSize, setTargetStringSize] = useState(20);
@@ -676,7 +670,6 @@ export default function ModuleHelioScopeCAD({
     if (setCapacityKw) setCapacityKw(0);
     setActiveCadTool("MANUAL_INSPECT");
 
-    // Remove temporary drawing layers / markers from Leaflet map if present
     if (map.current) {
       try {
         map.current.eachLayer((layer) => {
@@ -821,77 +814,70 @@ export default function ModuleHelioScopeCAD({
           </div>
           <button
             onClick={() => { setCadSubTab("CATALOG"); setIs3DMode(false); }}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
-              cadSubTab === "CATALOG"
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${cadSubTab === "CATALOG"
                 ? "bg-emerald-600 text-white shadow-xs"
                 : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-            }`}
+              }`}
           >
             <Package className="w-3.5 h-3.5" />
             1. Equipment
           </button>
           <button
             onClick={() => { setCadSubTab("SITE_SETUP"); setIs3DMode(false); }}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
-              cadSubTab === "SITE_SETUP"
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${cadSubTab === "SITE_SETUP"
                 ? "bg-emerald-600 text-white shadow-xs"
                 : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-            }`}
+              }`}
           >
             <MapPin className="w-3.5 h-3.5" />
             2. Site Setup
           </button>
           <button
             onClick={() => { setCadSubTab("LAYOUT"); setIs3DMode(false); }}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
-              cadSubTab === "LAYOUT" && !is3DMode
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${cadSubTab === "LAYOUT" && !is3DMode
                 ? "bg-emerald-600 text-white shadow-xs"
                 : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-            }`}
+              }`}
           >
             <Box className="w-3.5 h-3.5" />
             3. Array Designer
           </button>
           <button
             onClick={() => { setCadSubTab("SHADING"); setIs3DMode(false); }}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
-              cadSubTab === "SHADING"
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${cadSubTab === "SHADING"
                 ? "bg-emerald-600 text-white shadow-xs"
                 : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-            }`}
+              }`}
           >
             <Sun className="w-3.5 h-3.5" />
             4. Shading
           </button>
           <button
             onClick={() => { setCadSubTab("STRINGING"); setIs3DMode(false); }}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
-              cadSubTab === "STRINGING"
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${cadSubTab === "STRINGING"
                 ? "bg-emerald-600 text-white shadow-xs"
                 : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-            }`}
+              }`}
           >
             <Zap className="w-3.5 h-3.5" />
             5. Electrical & SLD
           </button>
           <button
             onClick={() => { setCadSubTab("PRODUCTION"); setIs3DMode(false); }}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
-              cadSubTab === "PRODUCTION"
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${cadSubTab === "PRODUCTION"
                 ? "bg-emerald-600 text-white shadow-xs"
                 : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-            }`}
+              }`}
           >
             <BarChart3 className="w-3.5 h-3.5" />
             6. Production
           </button>
           <button
             onClick={() => { setCadSubTab("REPORT"); setIs3DMode(false); }}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
-              cadSubTab === "REPORT"
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${cadSubTab === "REPORT"
                 ? "bg-emerald-600 text-white shadow-xs"
                 : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-            }`}
+              }`}
           >
             <FileText className="w-3.5 h-3.5" />
             7. Proposal
@@ -908,22 +894,20 @@ export default function ModuleHelioScopeCAD({
                   if (map.current) map.current.invalidateSize();
                 }, 50);
               }}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                viewportMode === "2D"
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${viewportMode === "2D"
                   ? "bg-emerald-500 text-slate-950 font-bold shadow-md"
                   : "text-slate-400 hover:text-white"
-              }`}
+                }`}
             >
               2D CAD
             </button>
             <button
               type="button"
               onClick={() => setViewportMode("3D")}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                viewportMode === "3D"
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${viewportMode === "3D"
                   ? "bg-emerald-500 text-slate-950 font-bold shadow-md"
                   : "text-slate-400 hover:text-white"
-              }`}
+                }`}
             >
               3D Perspective
             </button>
@@ -931,11 +915,9 @@ export default function ModuleHelioScopeCAD({
         )}
       </div>
 
-      {/* =========================================================================
-          SECTION 3: ARRAY DESIGNER — EQUAL-HEIGHT ALIGNED VIEWPORTS (670px)
-      ========================================================================= */}
+      {/* SECTION 3: ARRAY DESIGNER */}
       <div className={cadSubTab === "LAYOUT" ? "flex flex-col lg:flex-row gap-5 p-4 items-stretch w-full max-w-[1700px] mx-auto" : "hidden"}>
-        {/* Left Control Sidebar: Exact fixed height with internal vertical scroll */}
+        {/* Left Control Sidebar */}
         <div className="w-full lg:w-[410px] h-[670px] overflow-y-auto pr-2 bg-slate-900/95 rounded-2xl border border-slate-800 p-4 shrink-0 shadow-xl custom-scrollbar space-y-4 text-slate-100">
           <div className="bg-slate-800/80 border border-slate-700/80 p-4 rounded-2xl space-y-4 shadow-sm">
             {/* Field Segment Header */}
@@ -1060,22 +1042,20 @@ export default function ModuleHelioScopeCAD({
                     <button
                       type="button"
                       onClick={() => setTargetCapacityMode("AUTO_FIT")}
-                      className={`px-2 py-0.5 rounded-md font-bold transition cursor-pointer ${
-                        targetCapacityMode === "AUTO_FIT"
+                      className={`px-2 py-0.5 rounded-md font-bold transition cursor-pointer ${targetCapacityMode === "AUTO_FIT"
                           ? "bg-emerald-600 text-white shadow-xs"
                           : "text-slate-400 hover:text-slate-100"
-                      }`}
+                        }`}
                     >
                       Auto-Fit
                     </button>
                     <button
                       type="button"
                       onClick={() => setTargetCapacityMode("TARGET_CAP")}
-                      className={`px-2 py-0.5 rounded-md font-bold transition cursor-pointer ${
-                        targetCapacityMode === "TARGET_CAP"
+                      className={`px-2 py-0.5 rounded-md font-bold transition cursor-pointer ${targetCapacityMode === "TARGET_CAP"
                           ? "bg-emerald-600 text-white shadow-xs"
                           : "text-slate-400 hover:text-slate-100"
-                      }`}
+                        }`}
                     >
                       Target kWp
                     </button>
@@ -1140,11 +1120,10 @@ export default function ModuleHelioScopeCAD({
                             setTargetKwp(kw);
                             setTargetCapacityMode("TARGET_CAP");
                           }}
-                          className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold border transition cursor-pointer ${
-                            targetKwp === kw
+                          className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold border transition cursor-pointer ${targetKwp === kw
                               ? "bg-emerald-600 text-white border-emerald-500"
                               : "bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800"
-                          }`}
+                            }`}
                         >
                           {kw}k
                         </button>
@@ -1175,11 +1154,10 @@ export default function ModuleHelioScopeCAD({
                   <button
                     type="button"
                     onClick={() => setGridOffset({ x: 0, y: 0 })}
-                    className={`py-1.5 px-2 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 cursor-pointer transition border ${
-                      gridOffset.x !== 0 || gridOffset.y !== 0
+                    className={`py-1.5 px-2 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 cursor-pointer transition border ${gridOffset.x !== 0 || gridOffset.y !== 0
                         ? "bg-amber-900/40 text-amber-300 border-amber-600 hover:bg-amber-900/60"
                         : "bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800"
-                    }`}
+                      }`}
                     title="Reset array position to exact center of roof boundary"
                   >
                     <Move className="w-3 h-3 text-emerald-400" />
@@ -1221,33 +1199,30 @@ export default function ModuleHelioScopeCAD({
                 <button
                   type="button"
                   onClick={() => setRackingType("FLUSH_MOUNT")}
-                  className={`py-2 px-1.5 rounded-xl border text-[11px] font-bold transition truncate text-center cursor-pointer ${
-                    rackingType === "FLUSH_MOUNT" || rackingType.includes("Flush") || rackingType.includes("Fixed")
+                  className={`py-2 px-1.5 rounded-xl border text-[11px] font-bold transition truncate text-center cursor-pointer ${rackingType === "FLUSH_MOUNT" || rackingType.includes("Flush") || rackingType.includes("Fixed")
                       ? "bg-emerald-600 text-white border-emerald-500 shadow-sm"
                       : "bg-slate-950 text-slate-300 border-slate-700 hover:bg-slate-800"
-                  }`}
+                    }`}
                 >
                   Flush Mount
                 </button>
                 <button
                   type="button"
                   onClick={() => setRackingType("L2_ELEVATED")}
-                  className={`py-2 px-1.5 rounded-xl border text-[11px] font-bold transition truncate text-center cursor-pointer ${
-                    rackingType === "L2_ELEVATED" || rackingType === "L2 Elevated" || (rackingType.includes("L2") && !rackingType.includes("L3"))
+                  className={`py-2 px-1.5 rounded-xl border text-[11px] font-bold transition truncate text-center cursor-pointer ${rackingType === "L2_ELEVATED" || rackingType === "L2 Elevated" || (rackingType.includes("L2") && !rackingType.includes("L3"))
                       ? "bg-emerald-600 text-white border-emerald-500 shadow-sm"
                       : "bg-slate-950 text-slate-300 border-slate-700 hover:bg-slate-800"
-                  }`}
+                    }`}
                 >
                   L2 Elevated
                 </button>
                 <button
                   type="button"
                   onClick={() => setRackingType("L3_ELEVATED")}
-                  className={`py-2 px-1.5 rounded-xl border text-[11px] font-bold transition truncate text-center cursor-pointer ${
-                    rackingType === "L3_ELEVATED" || rackingType === "L3 Elevated" || rackingType.includes("L3")
+                  className={`py-2 px-1.5 rounded-xl border text-[11px] font-bold transition truncate text-center cursor-pointer ${rackingType === "L3_ELEVATED" || rackingType === "L3 Elevated" || rackingType.includes("L3")
                       ? "bg-emerald-600 text-white border-emerald-500 shadow-sm"
                       : "bg-slate-950 text-slate-300 border-slate-700 hover:bg-slate-800"
-                  }`}
+                    }`}
                 >
                   L3 Elevated
                 </button>
@@ -1286,11 +1261,10 @@ export default function ModuleHelioScopeCAD({
                     key={item.val}
                     type="button"
                     onClick={() => handleAzimuthChange(Number(item.val))}
-                    className={`py-1.5 px-0.5 rounded border font-bold transition truncate cursor-pointer ${
-                      Number(localAzimuth) === Number(item.val)
+                    className={`py-1.5 px-0.5 rounded border font-bold transition truncate cursor-pointer ${Number(localAzimuth) === Number(item.val)
                         ? "bg-emerald-600 text-white border-emerald-500 shadow-sm"
                         : "bg-slate-950 text-slate-300 border-slate-700 hover:bg-slate-800"
-                    }`}
+                      }`}
                   >
                     {item.label}
                   </button>
@@ -1330,11 +1304,10 @@ export default function ModuleHelioScopeCAD({
                     key={item.val}
                     type="button"
                     onClick={() => handleTiltChange(Number(item.val))}
-                    className={`py-1 px-1 rounded border font-bold transition truncate cursor-pointer ${
-                      Number(localTilt) === Number(item.val)
+                    className={`py-1 px-1 rounded border font-bold transition truncate cursor-pointer ${Number(localTilt) === Number(item.val)
                         ? "bg-emerald-600 text-white border-emerald-500 shadow-sm"
                         : "bg-slate-950 text-slate-300 border-slate-700 hover:bg-slate-800"
-                    }`}
+                      }`}
                   >
                     {item.label}
                   </button>
@@ -1354,11 +1327,10 @@ export default function ModuleHelioScopeCAD({
                 <button
                   type="button"
                   onClick={() => setGridAlignment("LEFT")}
-                  className={`py-2 px-1 rounded-lg border text-center transition flex flex-col items-center justify-center gap-1 cursor-pointer ${
-                    gridAlignment === "LEFT"
+                  className={`py-2 px-1 rounded-lg border text-center transition flex flex-col items-center justify-center gap-1 cursor-pointer ${gridAlignment === "LEFT"
                       ? "bg-indigo-600 text-white border-indigo-400 shadow-sm"
                       : "bg-slate-950 text-slate-300 border-slate-700 hover:bg-slate-800"
-                  }`}
+                    }`}
                   title="Left-Align array against boundary"
                 >
                   <span className="text-sm leading-none">⬅</span>
@@ -1367,11 +1339,10 @@ export default function ModuleHelioScopeCAD({
                 <button
                   type="button"
                   onClick={() => setGridAlignment("CENTER")}
-                  className={`py-2 px-1 rounded-lg border text-center transition flex flex-col items-center justify-center gap-1 cursor-pointer ${
-                    gridAlignment === "CENTER"
+                  className={`py-2 px-1 rounded-lg border text-center transition flex flex-col items-center justify-center gap-1 cursor-pointer ${gridAlignment === "CENTER"
                       ? "bg-indigo-600 text-white border-indigo-400 shadow-sm"
                       : "bg-slate-950 text-slate-300 border-slate-700 hover:bg-slate-800"
-                  }`}
+                    }`}
                   title="Center-Align array within boundary"
                 >
                   <span className="text-sm leading-none">⯀</span>
@@ -1380,11 +1351,10 @@ export default function ModuleHelioScopeCAD({
                 <button
                   type="button"
                   onClick={() => setGridAlignment("RIGHT")}
-                  className={`py-2 px-1 rounded-lg border text-center transition flex flex-col items-center justify-center gap-1 cursor-pointer ${
-                    gridAlignment === "RIGHT"
+                  className={`py-2 px-1 rounded-lg border text-center transition flex flex-col items-center justify-center gap-1 cursor-pointer ${gridAlignment === "RIGHT"
                       ? "bg-indigo-600 text-white border-indigo-400 shadow-sm"
                       : "bg-slate-950 text-slate-300 border-slate-700 hover:bg-slate-800"
-                  }`}
+                    }`}
                   title="Right-Align array against boundary"
                 >
                   <span className="text-sm leading-none">➡</span>
@@ -1393,11 +1363,10 @@ export default function ModuleHelioScopeCAD({
                 <button
                   type="button"
                   onClick={() => setGridAlignment("JUSTIFY")}
-                  className={`py-2 px-1 rounded-lg border text-center transition flex flex-col items-center justify-center gap-1 cursor-pointer ${
-                    gridAlignment === "JUSTIFY"
+                  className={`py-2 px-1 rounded-lg border text-center transition flex flex-col items-center justify-center gap-1 cursor-pointer ${gridAlignment === "JUSTIFY"
                       ? "bg-indigo-600 text-white border-indigo-400 shadow-sm"
                       : "bg-slate-950 text-slate-300 border-slate-700 hover:bg-slate-800"
-                  }`}
+                    }`}
                   title="Justify modules across field segment"
                 >
                   <span className="text-sm leading-none">⇿</span>
@@ -1441,7 +1410,7 @@ export default function ModuleHelioScopeCAD({
               </div>
             </div>
 
-            {/* 7. Mechanical Spacing Inputs: Row Spacing, Module Spacing, Frame Spacing */}
+            {/* 7. Mechanical Spacing Inputs */}
             <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-700/60 space-y-2.5 text-xs">
               <div className="flex items-center justify-between">
                 <label className="text-[11px] text-slate-300 font-medium">Row Spacing (Pitch):</label>
@@ -1517,22 +1486,20 @@ export default function ModuleHelioScopeCAD({
                 <button
                   type="button"
                   onClick={() => { setOrientation("PORTRAIT"); setRemovedModuleIds(new Set()); }}
-                  className={`py-2 px-3 rounded-xl border transition cursor-pointer ${
-                    orientation === "PORTRAIT"
+                  className={`py-2 px-3 rounded-xl border transition cursor-pointer ${orientation === "PORTRAIT"
                       ? "bg-indigo-600 text-white border-indigo-500 shadow-sm"
                       : "bg-slate-950 text-slate-300 border-slate-700 hover:bg-slate-800"
-                  }`}
+                    }`}
                 >
                   Portrait (Vertical 90°)
                 </button>
                 <button
                   type="button"
                   onClick={() => { setOrientation("LANDSCAPE"); setRemovedModuleIds(new Set()); }}
-                  className={`py-2 px-3 rounded-xl border transition cursor-pointer ${
-                    orientation === "LANDSCAPE"
+                  className={`py-2 px-3 rounded-xl border transition cursor-pointer ${orientation === "LANDSCAPE"
                       ? "bg-indigo-600 text-white border-indigo-500 shadow-sm"
                       : "bg-slate-950 text-slate-300 border-slate-700 hover:bg-slate-800"
-                  }`}
+                    }`}
                 >
                   Landscape (Horizontal 0°)
                 </button>
@@ -1581,11 +1548,10 @@ export default function ModuleHelioScopeCAD({
                 <button
                   type="button"
                   onClick={() => setShowElectricalLayer(prev => !prev)}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] font-black flex items-center gap-1 transition border cursor-pointer ${
-                    showElectricalLayer
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-black flex items-center gap-1 transition border cursor-pointer ${showElectricalLayer
                       ? "bg-cyan-500 text-slate-950 border-cyan-400 shadow-sm font-black"
                       : "bg-slate-800 text-cyan-400 border-cyan-800 hover:bg-slate-700"
-                  }`}
+                    }`}
                   title="Toggle Electrical Overlay on map"
                 >
                   <Zap className="w-3 h-3" />
@@ -1679,11 +1645,10 @@ export default function ModuleHelioScopeCAD({
                   setIs3DMode(false);
                   setActiveDrawingPoints([]);
                 }}
-                className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 text-xs cursor-pointer ${
-                  activeCadTool === "FIELD_SEGMENT" && !is3DMode
+                className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 text-xs cursor-pointer ${activeCadTool === "FIELD_SEGMENT" && !is3DMode
                     ? "bg-amber-500 text-slate-950 font-black shadow-xs"
                     : "bg-slate-800 text-amber-400 border border-slate-700 hover:bg-slate-700"
-                }`}
+                  }`}
                 title="HelioScope Field Segment: Click corners to draw yellow outline and auto-fill modules"
               >
                 <Layers className="w-3.5 h-3.5" /> New Field Segment
@@ -1703,11 +1668,10 @@ export default function ModuleHelioScopeCAD({
                 <button
                   type="button"
                   onClick={() => setIsAdjustingPosition(prev => !prev)}
-                  className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 text-xs shadow-xs cursor-pointer ${
-                    isAdjustingPosition
+                  className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 text-xs shadow-xs cursor-pointer ${isAdjustingPosition
                       ? "bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black animate-pulse"
                       : "bg-slate-800 text-sky-400 border border-sky-700/60 hover:bg-slate-700"
-                  }`}
+                    }`}
                   title={isAdjustingPosition ? "Click to lock solar array position in place" : "Click to show center handle and drag array across rooftop"}
                 >
                   {isAdjustingPosition ? (
@@ -1737,9 +1701,8 @@ export default function ModuleHelioScopeCAD({
                   setActiveCadTool("PAN_VIEW");
                   setIs3DMode(false);
                 }}
-                className={`px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 text-xs cursor-pointer ${
-                  activeCadTool === "PAN_VIEW" ? "bg-slate-700 text-white font-bold" : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
-                }`}
+                className={`px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 text-xs cursor-pointer ${activeCadTool === "PAN_VIEW" ? "bg-slate-700 text-white font-bold" : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
+                  }`}
                 title="Pan / Navigate Map"
               >
                 <Hand className="w-3.5 h-3.5" /> Pan Map
@@ -1751,9 +1714,8 @@ export default function ModuleHelioScopeCAD({
                   setActiveCadTool("ROOF_BOX");
                   setIs3DMode(false);
                 }}
-                className={`px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 text-xs cursor-pointer ${
-                  activeCadTool === "ROOF_BOX" ? "bg-emerald-600 text-white shadow-xs font-bold" : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
-                }`}
+                className={`px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 text-xs cursor-pointer ${activeCadTool === "ROOF_BOX" ? "bg-emerald-600 text-white shadow-xs font-bold" : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
+                  }`}
                 title="Snap Box Array (2 Clicks)"
               >
                 <Square className="w-3.5 h-3.5" /> Snap Box
@@ -1765,9 +1727,8 @@ export default function ModuleHelioScopeCAD({
                   setActiveCadTool("OBSTACLE_CIRCLE");
                   setIs3DMode(false);
                 }}
-                className={`px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 text-xs cursor-pointer ${
-                  activeCadTool === "OBSTACLE_CIRCLE" ? "bg-amber-600 text-white shadow-xs font-bold" : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
-                }`}
+                className={`px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 text-xs cursor-pointer ${activeCadTool === "OBSTACLE_CIRCLE" ? "bg-amber-600 text-white shadow-xs font-bold" : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
+                  }`}
                 title="Mark Circular Keepout Tank"
               >
                 <Plus className="w-3.5 h-3.5" /> Keepout
@@ -1779,9 +1740,8 @@ export default function ModuleHelioScopeCAD({
                   setActiveCadTool("MANUAL_INSPECT");
                   setIs3DMode(false);
                 }}
-                className={`px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 text-xs cursor-pointer ${
-                  activeCadTool === "MANUAL_INSPECT" ? "bg-emerald-600 text-white shadow-xs font-bold" : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
-                }`}
+                className={`px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 text-xs cursor-pointer ${activeCadTool === "MANUAL_INSPECT" ? "bg-emerald-600 text-white shadow-xs font-bold" : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
+                  }`}
                 title="Inspect modules / click to remove or right-click roof edge to align"
               >
                 <Eye className="w-3.5 h-3.5" /> Inspect / Align
@@ -1791,11 +1751,10 @@ export default function ModuleHelioScopeCAD({
               <button
                 type="button"
                 onClick={() => setShowElectricalLayer(prev => !prev)}
-                className={`px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 text-xs cursor-pointer ${
-                  showElectricalLayer || cadSubTab === "STRINGING"
+                className={`px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 text-xs cursor-pointer ${showElectricalLayer || cadSubTab === "STRINGING"
                     ? "bg-cyan-500 text-slate-950 font-black shadow-xs"
                     : "bg-slate-800 text-cyan-400 border border-cyan-800/80 hover:bg-slate-700"
-                }`}
+                  }`}
                 title="Toggle Electrical Layer: Inverters, Strings & Conduit Homerun"
               >
                 <Zap className="w-3.5 h-3.5" /> ⚡ Electrical Layer
@@ -2026,7 +1985,7 @@ export default function ModuleHelioScopeCAD({
             )}
           </div>
 
-          {/* Dedicated Horizontal Metrics Bar Below Map (100% Clear View of Rooftop) */}
+          {/* Dedicated Horizontal Metrics Bar Below Map */}
           <div className="bg-slate-900/95 border-t border-slate-800 px-6 py-2.5 flex items-center justify-around text-xs shrink-0 z-10 shadow-lg">
             <div className="flex flex-col items-center">
               <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">System Size</span>
@@ -2070,9 +2029,7 @@ export default function ModuleHelioScopeCAD({
         </div>
       </div>
 
-      {/* =========================================================================
-          SECTION 1: EQUIPMENT CATALOG (PANELS, INVERTERS, RACKING)
-      ========================================================================= */}
+      {/* SECTION 1: EQUIPMENT CATALOG (PANELS, INVERTERS, RACKING) */}
       {cadSubTab === "CATALOG" && (
         <HelioScopeCatalog
           activePanelKey={selectedModuleKey}
@@ -2084,6 +2041,7 @@ export default function ModuleHelioScopeCAD({
             handleSaveDesign({ selectedPanelModel: panel.modelName, panelWattage: panel.wattage });
           }}
           onSelectInverter={(inv) => {
+            userOverrodeInverterRef.current = true;
             setSelectedInverterModel(inv.modelName);
             setInverterCapacityKw(inv.ratedAcOutputKw);
             handleSaveDesign({ selectedInverterModel: inv.modelName, inverterCapacityKw: inv.ratedAcOutputKw });
@@ -2095,9 +2053,7 @@ export default function ModuleHelioScopeCAD({
         />
       )}
 
-      {/* =========================================================================
-          SECTION 2: PROJECT & SITE SETUP (GPS, ROOF TYPE, USABLE AREA, UTILITY)
-      ========================================================================= */}
+      {/* SECTION 2: PROJECT & SITE SETUP */}
       {cadSubTab === "SITE_SETUP" && (
         <HelioScopeSiteSetup
           activeProject={activeProject}
@@ -2110,9 +2066,7 @@ export default function ModuleHelioScopeCAD({
         />
       )}
 
-      {/* =========================================================================
-          SECTION 4: SHADING & SUN PATH ANALYSIS (NOAA SPA, POLAR SUN PATH & HEATMAP)
-      ========================================================================= */}
+      {/* SECTION 4: SHADING & SUN PATH ANALYSIS */}
       {cadSubTab === "SHADING" && (
         <HelioScopeShadingAnalysis
           siteLat={siteLat}
@@ -2124,9 +2078,7 @@ export default function ModuleHelioScopeCAD({
         />
       )}
 
-      {/* =========================================================================
-          SECTION 5: ELECTRICAL STRINGING & WIRING DESIGN (MPPT, WIRE DROP & SLD)
-      ========================================================================= */}
+      {/* SECTION 5: ELECTRICAL STRINGING & WIRING DESIGN */}
       {cadSubTab === "STRINGING" && (
         <HelioScopeElectricalDesign
           systemStats={systemStats}
@@ -2138,9 +2090,7 @@ export default function ModuleHelioScopeCAD({
         />
       )}
 
-      {/* =========================================================================
-          SECTION 6: PRODUCTION & ENERGY ESTIMATE (PVWATTS & LOSS TREE WATERFALL)
-      ========================================================================= */}
+      {/* SECTION 6: PRODUCTION & ENERGY ESTIMATE */}
       {cadSubTab === "PRODUCTION" && (
         <HelioScopeProductionReport
           systemStats={systemStats}
@@ -2151,9 +2101,7 @@ export default function ModuleHelioScopeCAD({
         />
       )}
 
-      {/* =========================================================================
-          SECTION 7: PROPOSAL & REPORT EXPORT (1-CLICK CLIENT PDF & BOQ SYNC)
-      ========================================================================= */}
+      {/* SECTION 7: PROPOSAL & REPORT EXPORT */}
       {cadSubTab === "REPORT" && (
         <HelioScopeReportExport
           activeProject={activeProject}
