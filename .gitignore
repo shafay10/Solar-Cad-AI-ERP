@@ -2,9 +2,11 @@
 node_modules/
 */node_modules/
 
-# Production builds
+# Production builds & cache
 dist/
 */dist/
+.vite/
+*/.vite/
 
 # Environment Variables & Secrets
 .env
