@@ -14,9 +14,11 @@ import {
 
 /**
  * HelioScopeCanvasOverlay — Production-Grade 60 FPS HTML5 Vector CAD Engine
- * ★ v2.3: Crash guard (non-finite panel skip), Shadow stretch cap (140px),
- *   Tool-change SnapBox point clear, PAN_VIEW bypass, Sim shadows boosted + sun badge,
- *   Multi-keepout, SnapBox first-point marker, Edge-align wide hit area (42px).
+ * v2.6: simOverride (Shading sliders live-sync shadows on map), Sim widget
+ * hidden on Shading tab, dramatic sim shadows (3.5x / 420px cap), Move
+ * priority drag, MANUAL ROTATE gizmo (orange handle above array), keepout
+ * labels, crash guard, edge-align 42px, single-scaling render (engine packs
+ * at arrayScale — no double-scaling runaway).
  */
 function renderRackingUnderneath(ctx, cornersPx, rackingType, showShadows) {
   if (!ctx || !cornersPx || cornersPx.length < 4) return;
@@ -34,22 +36,10 @@ function renderRackingUnderneath(ctx, cornersPx, rackingType, showShadows) {
     if (isFlush) {
       ctx.save();
       ctx.lineCap = "round";
-      const r1Start = {
-        x: cornersPx[0].x * 0.8 + cornersPx[1].x * 0.2,
-        y: cornersPx[0].y * 0.8 + cornersPx[1].y * 0.2
-      };
-      const r1End = {
-        x: cornersPx[3].x * 0.8 + cornersPx[2].x * 0.2,
-        y: cornersPx[3].y * 0.8 + cornersPx[2].y * 0.2
-      };
-      const r2Start = {
-        x: cornersPx[0].x * 0.2 + cornersPx[1].x * 0.8,
-        y: cornersPx[0].y * 0.2 + cornersPx[1].y * 0.8
-      };
-      const r2End = {
-        x: cornersPx[3].x * 0.2 + cornersPx[2].x * 0.8,
-        y: cornersPx[3].y * 0.2 + cornersPx[2].y * 0.8
-      };
+      const r1Start = { x: cornersPx[0].x * 0.8 + cornersPx[1].x * 0.2, y: cornersPx[0].y * 0.8 + cornersPx[1].y * 0.2 };
+      const r1End = { x: cornersPx[3].x * 0.8 + cornersPx[2].x * 0.2, y: cornersPx[3].y * 0.8 + cornersPx[2].y * 0.2 };
+      const r2Start = { x: cornersPx[0].x * 0.2 + cornersPx[1].x * 0.8, y: cornersPx[0].y * 0.2 + cornersPx[1].y * 0.8 };
+      const r2End = { x: cornersPx[3].x * 0.2 + cornersPx[2].x * 0.8, y: cornersPx[3].y * 0.2 + cornersPx[2].y * 0.8 };
       ctx.strokeStyle = "rgba(15, 23, 42, 0.4)";
       ctx.lineWidth = 2.2;
       ctx.beginPath();
@@ -75,10 +65,7 @@ function renderRackingUnderneath(ctx, cornersPx, rackingType, showShadows) {
 
     ctx.save();
     const pillars = cornersPx.map(p => ({
-      topX: p.x,
-      topY: p.y,
-      baseX: p.x,
-      baseY: p.y + legDropPx
+      topX: p.x, topY: p.y, baseX: p.x, baseY: p.y + legDropPx
     }));
 
     if (showShadows) {
@@ -170,7 +157,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   map,
   activeCadTool = "FIELD_SEGMENT",
   setActiveCadTool,
-  selectedModuleKey = "Jinko Solar Tiger Neo 585W",
+  selectedModuleKey = "Trina Solar Vertex 550W",
   orientation = "PORTRAIT",
   tiltDegrees = 18,
   azimuthDegrees = 180,
@@ -197,6 +184,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   targetCapacityMode = "AUTO_FIT",
   targetKwp = 35,
   targetKwP = targetKwp,
+  manualSegments = [],
   gridOffset = { x: 0, y: 0 },
   setGridOffset,
   isAdjustingPosition = false,
@@ -217,7 +205,8 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   setActiveDrawingPoints = null,
   onUndoLastPoint = null,
   onClearDrawing = null,
-  rackingType = "L2_ELEVATED"
+  rackingType = "L2_ELEVATED",
+  simOverride = false
 }, ref) {
   const canvasRef = useRef(null);
   const animFrameRef = useRef(null);
@@ -225,15 +214,13 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   const drawSceneRef = useRef(null);
   const [placedPanels, setPlacedPanels] = useState([]);
 
-  // ★ Local Lock / Move / Pitch-mode toggles
   const [localLock, setLocalLock] = useState(false);
   const [localMove, setLocalMove] = useState(false);
   const [pitchAuto, setPitchAuto] = useState(true);
 
-  // ★ Sun Time Simulation — state & refs
   const [timeSim, setTimeSim] = useState(false);
   const [sunHour, setSunHour] = useState(12);
-  const [sunDay, setSunDay] = useState(172); // Jun 21
+  const [sunDay, setSunDay] = useState(172);
   const [playing, setPlaying] = useState(false);
   const timeSimRef = useRef(false);
   const simSunRef = useRef({ elevationDeg: 45, azimuthDeg: 180 });
@@ -258,7 +245,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     { label: "Dec 21", day: 355 }
   ];
 
-  // Top-Level Hoisted Redraw Dispatcher (TDZ-safe)
   const requestRedraw = useCallback(() => {
     if (isDrawScheduledRef.current) return;
     isDrawScheduledRef.current = true;
@@ -270,9 +256,8 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     });
   }, []);
 
-  // ★ Sun Sim useEffects — AFTER requestRedraw (TDZ-safe)
   useEffect(() => {
-    if (!timeSim) {
+    if (!timeSim || simOverride) {
       timeSimRef.current = false;
       requestRedraw();
       return;
@@ -280,7 +265,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     simSunRef.current = calculateSolarPosition(siteLatitude, sunDay, sunHour);
     timeSimRef.current = true;
     requestRedraw();
-  }, [timeSim, sunDay, sunHour, siteLatitude, requestRedraw]);
+  }, [timeSim, sunDay, sunHour, siteLatitude, requestRedraw, simOverride]);
 
   useEffect(() => () => {
     if (playIntervalRef.current) clearInterval(playIntervalRef.current);
@@ -325,7 +310,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     requestRedraw();
   }, [requestRedraw]);
 
-  // Drawing & Mouse State (refs only)
   const p1Ref = useRef(null);
   const mousePosPxRef = useRef(null);
   const mouseGpsRef = useRef(null);
@@ -377,6 +361,13 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
 
   const activePolyPointsRef = useRef([]);
   const [isNearFirstPoint, setIsNearFirstPoint] = useState(false);
+
+  // MANUAL ROTATE gizmo refs
+  const rotateHandlePxRef = useRef(null);
+  const arrayCenterPxRef = useRef(null);
+  const isRotatingRef = useRef(false);
+  const rotateStartAngleRef = useRef(0);
+  const rotateStartAzRef = useRef(180);
 
   useEffect(() => {
     if (Array.isArray(activeDrawingPoints)) {
@@ -443,7 +434,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
 
   const isDrawing = activeCadTool === "FIELD_SEGMENT" || activeCadTool === "ROOF_PERIMETER" || activeCadTool === "ROOF_BOX" || activeCadTool === "OBSTACLE_CIRCLE";
 
-  // 1. HARD MAP LOCK DURING ACTIVE DRAWING
   useEffect(() => {
     if (!map) return;
     if (isDrawing) {
@@ -466,13 +456,11 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       if (container) container.style.cursor = "grab";
     }
 
-    // ★ Lock ON = Leaflet native drag band (canvas panBy single path)
     if (effLock && !isDrawing) {
       map.dragging?.disable();
     }
   }, [map, isDrawing, effLock]);
 
-  // ESC key handler
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
@@ -705,7 +693,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       ctx.restore();
     }
 
-    // ★ SnapBox: pehli click ka visible orange dot marker (sirf ROOF_BOX tool pe)
+    // SnapBox first-click marker
     if (activeCadTool === "ROOF_BOX" && p1Ref.current) {
       const p1px = toPx(p1Ref.current.lat, p1Ref.current.lng);
       ctx.save();
@@ -718,7 +706,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       ctx.stroke();
       ctx.fillStyle = "#fbbf24";
       ctx.font = "bold 10px sans-serif";
-      ctx.fillText("Start — ab dusri corner pe click karo", p1px.x + 12, p1px.y - 10);
+      ctx.fillText("Start — click the second corner now", p1px.x + 12, p1px.y - 10);
       ctx.restore();
     }
 
@@ -745,7 +733,11 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       cachedPanelsRef.current = currentPanels;
     }
 
-    const panels = safePanels;
+    const manualPanelsList = Array.isArray(manualSegments)
+      ? manualSegments.flatMap(seg => seg.panels || [])
+      : [];
+
+    const panels = [...safePanels, ...manualPanelsList];
     const deltaLat = isDraggingArrayRef.current ? (dragDeltaGpsRef.current?.lat || 0) : 0;
     const deltaLng = isDraggingArrayRef.current ? (dragDeltaGpsRef.current?.lng || 0) : 0;
 
@@ -771,10 +763,10 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     }
 
     let scale = 18;
-    if (map && roofCentroidGps) {
+    if (map) {
       try {
-        const cGpsLat = roofCentroidGps.lat ?? roofCentroidGps[0];
-        const cGpsLng = roofCentroidGps.lng ?? roofCentroidGps[1];
+        const cGpsLat = roofCentroidGps ? (roofCentroidGps.lat ?? roofCentroidGps[0]) : (map.getCenter()?.lat || 31.5);
+        const cGpsLng = roofCentroidGps ? (roofCentroidGps.lng ?? roofCentroidGps[1]) : (map.getCenter()?.lng || 73.0);
         const cGps = L.latLng(cGpsLat, cGpsLng);
         const p1 = map.latLngToContainerPoint(cGps);
         const p2 = map.latLngToContainerPoint(L.latLng(cGps.lat + 1 / 111139, cGps.lng));
@@ -794,7 +786,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       const activeTilt = Number(mod.tilt !== undefined ? mod.tilt : tiltDegrees) || 0;
       const tiltRad = (activeTilt * Math.PI) / 180;
       const baseScale = Number(scale) || 1;
-      const s = (typeof arrayScale === 'number' && isFinite(arrayScale) && arrayScale > 0.2) ? arrayScale : 1.0;
 
       const isLandscape = p.orientation === "LANDSCAPE" || orientation === "LANDSCAPE";
       const baseW = isLandscape ? 2.278 : 1.134;
@@ -802,8 +793,9 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       const rawW = p.width ? (Number(p.width) > 10 ? Number(p.width) / 1000 : Number(p.width)) : baseW;
       const rawL = p.length ? (Number(p.length) > 10 ? Number(p.length) / 1000 : Number(p.length)) : baseL;
 
-      const visualWidth = Math.max(0.2, (Number(rawW) || 1.134) * baseScale);
-      const visualLength = Math.max(0.2, (Number(rawL) || 2.278) * Math.cos(tiltRad) * baseScale);
+      const effArrayScale = Number(arrayScale) || 1.0;
+      const visualWidth = Math.max(0.2, (Number(rawW) || 1.134) * baseScale * effArrayScale);
+      const visualLength = Math.max(0.2, (Number(rawL) || 2.278) * Math.cos(tiltRad) * baseScale * effArrayScale);
       const pWidth = visualWidth;
       const pLength = visualLength;
 
@@ -837,8 +829,9 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       if (rotX === undefined || !isFinite(rotX) || isNaN(rotX)) rotX = 0;
       if (rotY === undefined || !isFinite(rotY) || isNaN(rotY)) rotY = 0;
 
-      let px = centerPoint.x + (rotX * s);
-      let py = centerPoint.y + (rotY * s);
+      // Visual array scaling: panels scale around centerPoint (count stays locked)
+      let px = centerPoint.x + rotX * effArrayScale;
+      let py = centerPoint.y + rotY * effArrayScale;
 
       if (deltaLat !== 0 || deltaLng !== 0) {
         const dPx = toPx(
@@ -895,7 +888,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
 
     try {
       // PASS 1: RACKING + AMBIENT SHADOWS
-      preparedPanels.forEach(({ cornersPx, isRemoved, modRackingType }) => {
+      preparedPanels.forEach(({ cornersPx, isRemoved, modRackingType, pL }) => {
         if (isRemoved) return;
         if (showShadows) {
           const effElev = timeSimRef.current ? simSunRef.current.elevationDeg : solarElevation;
@@ -903,7 +896,13 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           const elevRad = (Math.max(5, effElev) * Math.PI) / 180;
           const azRad = (effAzim * Math.PI) / 180;
           const tiltFactor = Math.sin((tiltDegrees * Math.PI) / 180);
-          const shadowDistPx = Math.min(12, Math.max(2, (3 + tiltFactor * 6) / Math.tan(elevRad)));
+          // Sim / Shading mode: longer, clearly moving ambient shadows
+          // FIX: Use panel length (pL) for accurate shadow calculation
+          const panelLengthPx = Math.max(6, (Number(pL) || 12));
+          const simActiveP1 = timeSimRef.current || simOverride;
+          const shadowDistPx = simActiveP1
+            ? Math.min(60, Math.max(6, (panelLengthPx * tiltFactor) / Math.tan(elevRad) * 2.0))
+            : Math.min(15, Math.max(3, (panelLengthPx * tiltFactor) / Math.tan(elevRad)));
           const shadowVec = {
             x: -Math.sin(azRad) * shadowDistPx,
             y: Math.cos(azRad) * shadowDistPx
@@ -924,8 +923,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
 
       // PASS 2: MODULE FACES + DYNAMIC SUN SHADOWS
       preparedPanels.forEach(({ mod, drawX, drawY, pW, pL, pLengthM, tiltRad: panelTiltRad, azRad, isRemoved, isHovered, modRackingType }) => {
-        // ★ FIX CRASH: non-finite panel dimensions par createLinearGradient throw
-        // karta tha ("non-finite double value" Safeguard error) — ab broken panel skip
+        // Crash guard: skip panels with non-finite dimensions
         if (!isFinite(drawX) || !isFinite(drawY) || !isFinite(pW) || !isFinite(pL) || pW <= 0.1 || pL <= 0.1) return;
         if (isRemoved) {
           ctx.save();
@@ -941,16 +939,23 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         }
 
         if (showShadows) {
+          // FIX: Use accurate sun position calculation from helioscopeEngine
           const sunAlt = timeSimRef.current ? Math.max(5, simSunRef.current.elevationDeg) : Math.max(5, Number(sunAltitudeDeg ?? solarElevation ?? 45));
           const sunAz = timeSimRef.current ? simSunRef.current.azimuthDeg : Number(sunAzimuthDeg ?? solarAzimuth ?? 180);
+          
+          // Ensure elevation is never below horizon for shadow calculation
+          const effectiveElev = Math.max(5, sunAlt);
+          const elevRad = (effectiveElev * Math.PI) / 180;
+          const azRad = ((sunAz - 180) * Math.PI) / 180;
 
           const effLength = Number(pLengthM) || 2.278;
           const effTiltRad = Number(panelTiltRad) || 0;
           const shadowLengthMeters = (effLength * Math.sin(effTiltRad) + (modRackingType === 'L3_ELEVATED' ? 1.5 : 0.8)) / Math.tan((sunAlt * Math.PI) / 180);
-          // ★ FIX STRETCH: sunset (18:00) pe sun neecha → shadow physically 30m+ lambi
-          // thi jo lines ki tarah stretch dikhti thi — ab 140px pe cap hai
-          const simBoost = timeSimRef.current ? 2.2 : 1;
-          const shadowPx = Math.min(shadowLengthMeters * scale * simBoost, 140);
+          // Sim / Shading mode: much longer, clearly moving shadows
+          const simActive = timeSimRef.current || simOverride;
+          const simBoost = simActive ? 3.5 : 1;
+          const capPx = simActive ? 420 : 140;
+          const shadowPx = Math.min(shadowLengthMeters * scale * simBoost, capPx);
 
           const shadowAngleRad = ((sunAz + 180) * Math.PI) / 180;
           const shadowDx = Math.sin(shadowAngleRad) * shadowPx;
@@ -958,7 +963,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
 
           ctx.save();
           ctx.translate(drawX, drawY);
-          ctx.fillStyle = timeSimRef.current ? "rgba(15, 23, 42, 0.5)" : "rgba(15, 23, 42, 0.42)";
+          ctx.fillStyle = simActive ? "rgba(15, 23, 42, 0.5)" : "rgba(15, 23, 42, 0.42)";
           ctx.beginPath();
           ctx.moveTo(-pW / 2, -pL / 2);
           ctx.lineTo(pW / 2, -pL / 2);
@@ -969,7 +974,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           ctx.restore();
         }
 
-        // ★ REALISTIC module: frame + cell grid + busbars + glass shine
+        // REALISTIC module: frame + cell grid + busbars + glass shine
         ctx.save();
         ctx.translate(drawX, drawY);
         ctx.rotate(azRad);
@@ -1042,8 +1047,31 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
 
     if (panels.length > 0 && isFinite(bboxMinX)) {
       arrayBboxPxRef.current = { minX: bboxMinX, maxX: bboxMaxX, minY: bboxMinY, maxY: bboxMaxY };
+
+      // MANUAL ROTATE gizmo: orange handle above the array (drag to rotate)
+      const gizmoCx = (bboxMinX + bboxMaxX) / 2;
+      const gizmoHy = bboxMinY - 34;
+      arrayCenterPxRef.current = { x: gizmoCx, y: (bboxMinY + bboxMaxY) / 2 };
+      rotateHandlePxRef.current = { x: gizmoCx, y: gizmoHy };
+      ctx.save();
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(gizmoCx, bboxMinY);
+      ctx.lineTo(gizmoCx, gizmoHy);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(gizmoCx, gizmoHy, 9, 0, Math.PI * 2);
+      ctx.fillStyle = "#f59e0b";
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
     } else {
       arrayBboxPxRef.current = null;
+      rotateHandlePxRef.current = null;
+      arrayCenterPxRef.current = null;
     }
 
     // E. ARRAY ANCHOR (drag coordinates)
@@ -1080,7 +1108,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       anchorPxRef.current = null;
     }
 
-    // F. KEEPOUT OBSTACLES
+    // F. KEEPOUT OBSTACLES (with labels)
     keepouts.forEach((obs) => {
       const centerPx = toPx(obs.lat, obs.lng);
       const edgeGps = [obs.lat, obs.lng + (obs.radiusM / (111320 * Math.cos((obs.lat * Math.PI) / 180)))];
@@ -1095,20 +1123,52 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       ctx.arc(centerPx.x, centerPx.y, radiusPx, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
+      ctx.fillStyle = "#fecdd3";
+      ctx.font = "bold 9px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`Keepout ${obs.radiusM}m`, centerPx.x, centerPx.y - radiusPx - 5);
       ctx.restore();
     });
 
     // G. ELECTRICAL OVERLAY — Inverters, Strings & Lightning Badges
-    if (showElectricalLayer && panels.length > 0 && roofPolygon && roofPolygon.length >= 3) {
+    // FIX: Remove roofPolygon length check to allow overlay on manual segments
+    // Also ensure panelsRef.current is used as fallback for panels
+    const activePanelsForElectrical = (panels && panels.length > 0) ? panels : (panelsRef.current || []);
+    if (showElectricalLayer && activePanelsForElectrical.length > 0) {
       ctx.save();
 
       const invRatingKw = inverterCapacityKw || 100;
-      const activePanelCount = panels.length - (removedModuleIds ? removedModuleIds.size : 0);
-      const avgW = panels.reduce((a, p) => a + (Number(p.wattage) || 585), 0) / Math.max(1, panels.length);
+      const activePanelCount = activePanelsForElectrical.length - (removedModuleIds ? removedModuleIds.size : 0);
+      const avgW = activePanelsForElectrical.reduce((a, p) => a + (Number(p.wattage) || 550), 0) / Math.max(1, activePanelsForElectrical.length);
       const sysSizeKwp = (activePanelCount * avgW) / 1000;
       const invQty = Math.max(1, Math.ceil(sysSizeKwp / (invRatingKw * 1.25)));
 
-      const roofPxPts = roofPolygon.map(([lat, lng]) => toPx(lat, lng));
+      // FIX: Use roofPolygon if available, otherwise use bounding box of panels
+      let roofPxPts = [];
+      if (roofPolygon && roofPolygon.length >= 3) {
+        roofPxPts = roofPolygon.map(([lat, lng]) => toPx(lat, lng));
+      } else {
+        // Fallback: create bounding box from panel positions
+        const panelPxPositions = activePanelsForElectrical.map(p => {
+          const c = p.center || p.centerGps;
+          if (c) return toPx(Array.isArray(c) ? c[0] : c.lat, Array.isArray(c) ? c[1] : c.lng);
+          return { x: 0, y: 0 };
+        }).filter(pt => pt.x !== 0 || pt.y !== 0);
+        
+        if (panelPxPositions.length > 0) {
+          const minX = Math.min(...panelPxPositions.map(p => p.x));
+          const maxX = Math.max(...panelPxPositions.map(p => p.x));
+          const minY = Math.min(...panelPxPositions.map(p => p.y));
+          const maxY = Math.max(...panelPxPositions.map(p => p.y));
+          const pad = 50;
+          roofPxPts = [
+            { x: minX - pad, y: minY - pad },
+            { x: maxX + pad, y: minY - pad },
+            { x: maxX + pad, y: maxY + pad },
+            { x: minX - pad, y: maxY + pad }
+          ];
+        }
+      }
       const perimeterSegs = [];
       let totalPerimPx = 0;
       for (let i = 0; i < roofPxPts.length; i++) {
@@ -1187,7 +1247,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       });
 
       const strSize = Math.max(1, targetStringSize || 20);
-      const activePanels = panels.filter(p => !removedModuleIds || !removedModuleIds.has(p.id));
+      const activePanels = activePanelsForElectrical.filter(p => !removedModuleIds || !removedModuleIds.has(p.id));
       const strings = [];
       for (let s = 0; s < activePanels.length; s += strSize) {
         strings.push(activePanels.slice(s, s + strSize));
@@ -1256,7 +1316,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       ctx.restore();
     }
 
-    // H. SUN SIM INDICATOR BADGE (Sim ON hone par upar-right ☀ elevation/azimuth)
+    // H. SUN SIM INDICATOR BADGE
     if (timeSimRef.current) {
       const bx = width - 150;
       const by = 14;
@@ -1274,7 +1334,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       ctx.fillText(`☀ ${Math.round(simSunRef.current.elevationDeg)}° elev`, bx + 10, by + 18);
       ctx.fillStyle = "#94a3b8";
       ctx.font = "10px monospace";
-      ctx.fillText(`az ${Math.round(simSunRef.current.azimuthDeg)}°  shadow ⟲ live`, bx + 10, by + 35);
+      ctx.fillText(`az ${Math.round(simSunRef.current.azimuthDeg)}°  shadow live`, bx + 10, by + 35);
       ctx.restore();
     }
 
@@ -1303,8 +1363,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   ]);
   drawSceneRef.current = drawScene;
 
-  // ★ FIX: Tool change par Snap Box ka pehla point clear — warna purana orange
-  // dot galat jagah dikhta rehta hai (keepout/pan switch ke baad bhi)
+  // Clear SnapBox first point on tool change
   useEffect(() => {
     p1Ref.current = null;
   }, [activeCadTool]);
@@ -1377,7 +1436,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       return;
     }
 
-    const spec = MODULE_PHYSICAL_SPECS[selectedModuleKey] || MODULE_PHYSICAL_SPECS["Jinko Solar Tiger Neo 585W"];
+    const spec = MODULE_PHYSICAL_SPECS[selectedModuleKey] || MODULE_PHYSICAL_SPECS["Trina Solar Vertex 550W"];
     const lengthM = spec.lengthMm / 1000;
     const widthM = spec.widthMm / 1000;
     const moduleWidth = orientation === "PORTRAIT" ? widthM : lengthM;
@@ -1596,7 +1655,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     const cLat = Array.isArray(centroid) ? centroid[0] : (centroid?.lat || 0);
     const cLng = Array.isArray(centroid) ? centroid[1] : (centroid?.lng || 0);
 
-    const spec = MODULE_PHYSICAL_SPECS[selectedModuleKey] || MODULE_PHYSICAL_SPECS["Jinko Solar Tiger Neo 585W"];
+    const spec = MODULE_PHYSICAL_SPECS[selectedModuleKey] || MODULE_PHYSICAL_SPECS["Trina Solar Vertex 550W"];
     const lengthM = spec.lengthMm / 1000;
     const widthM = spec.widthMm / 1000;
     const moduleWidth = orientation === "PORTRAIT" ? widthM : lengthM;
@@ -1628,9 +1687,11 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       frameSpacing,
       gridAlignment,
       targetCapacityMode,
-      targetCount: (targetKwP || targetKwp) ? Math.round(((Number(targetKwP || targetKwp)) * 1000) / (spec.wattage || 585)) : null,
-      targetKwp: targetKwP || targetKwp,
-      targetKwP: targetKwP || targetKwp,
+      targetCount: (targetCapacityMode === "TARGET_CAP" && (targetKwP || targetKwp))
+        ? Math.max(1, Math.round(((Number(targetKwP || targetKwp)) * 1000) / (spec?.wattage || 550)))
+        : null,
+      targetKwp: targetCapacityMode === "TARGET_CAP" ? (targetKwP || targetKwp) : null,
+      targetKwP: targetCapacityMode === "TARGET_CAP" ? (targetKwP || targetKwp) : null,
       gridOffset,
       keepouts,
       wattage: spec.wattage,
@@ -1674,12 +1735,12 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
       if (onArrayCalculated) {
         onArrayCalculated({
           modulesCount: updatedPanels.length,
-          kwp: Math.round(((updatedPanels.length * (spec.wattage || 585)) / 1000) * 10) / 10,
+          kwp: Math.round(((updatedPanels.length * (spec?.wattage || 550)) / 1000) * 10) / 10,
           panels: formatted,
           roofPolygon: activePoly,
           metrics: {
             count: updatedPanels.length,
-            capacityKw: Math.round(((updatedPanels.length * (spec.wattage || 585)) / 1000) * 10) / 10
+            capacityKw: Math.round(((updatedPanels.length * (spec?.wattage || 550)) / 1000) * 10) / 10
           },
           anchor: [cLat, cLng]
         });
@@ -1726,6 +1787,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     targetCapacityMode,
     targetKwp,
     targetKwP,
+    manualSegments,
     gridOffset,
     keepouts,
     siteLatitude,
@@ -1743,7 +1805,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     return Math.hypot(px - (x1 + t * (x2 - x1)), py - (y1 + t * (y2 - y1)));
   };
 
-  // ★ FIX EDGE-ALIGN: optional wide hit radius (contextmenu 42px, drag 28px)
+  // Edge-align: optional wide hit radius (contextmenu 42px, drag 28px)
   const findClosestRoofEdge = (clickPx, maxDistPx = 28) => {
     const activePoly = activePolyDragRef.current || roofPolygon;
     if (!activePoly || activePoly.length < 3) return null;
@@ -1809,7 +1871,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
 
       const activePoly = activePolyDragRef.current || roofPolygon;
 
-      // ★ LOCK GUARD
+      // LOCK GUARD
       if (effLock) {
         isDraggingMapRef.current = true;
         hasDraggedRef.current = false;
@@ -1818,14 +1880,51 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         return;
       }
 
-      // ★ FIX PAN MAP: PAN_VIEW mein vertex/edge/array hit-tests SKIP —
-      // hamesha seedha map pan (pehle edges ke paas drag se edge-drag ho jata tha)
+      // PAN_VIEW: skip all hit-tests, always pan
       if (activeCadTool === "PAN_VIEW") {
         isDraggingMapRef.current = true;
         hasDraggedRef.current = false;
         dragStartRef.current = { x: e.clientX, y: e.clientY };
         if (canvasRef.current) canvasRef.current.style.cursor = "grabbing";
         return;
+      }
+
+      // ROTATE HANDLE drag (manual rotate)
+      if (rotateHandlePxRef.current && !isDrawing) {
+        const rh = rotateHandlePxRef.current;
+        if (Math.hypot(mouseX - rh.x, mouseY - rh.y) <= 16) {
+          if (map.dragging) map.dragging.disable();
+          isRotatingRef.current = true;
+          const c = arrayCenterPxRef.current || { x: mouseX, y: mouseY };
+          rotateStartAngleRef.current = Math.atan2(mouseY - c.y, mouseX - c.x) * 180 / Math.PI;
+          rotateStartAzRef.current = Number(azimuthDegrees) || 180;
+          if (canvasRef.current) canvasRef.current.style.cursor = "grabbing";
+          return;
+        }
+      }
+
+      // MOVE PRIORITY: when Move Mode is ON, array hit-test runs FIRST
+      if (moveActive && panelsRef.current.length > 0 && arrayBboxPxRef.current) {
+        const bbE = arrayBboxPxRef.current;
+        const padE = 12;
+        const insideE = (mouseX >= bbE.minX - padE && mouseX <= bbE.maxX + padE &&
+          mouseY >= bbE.minY - padE && mouseY <= bbE.maxY + padE);
+        if (insideE) {
+          if (map.dragging) map.dragging.disable();
+          isDraggingArrayRef.current = true;
+          isDraggingAnchorRef.current = false;
+          hasDraggedRef.current = false;
+          dragStartMouseGpsRef.current = toGps(mouseX, mouseY);
+          dragStartScreenPxRef.current = { x: e.clientX, y: e.clientY };
+          dragStartOffsetRef.current = { ...(gridOffsetRef.current || { x: 0, y: 0 }) };
+          dragDeltaGpsRef.current = { lat: 0, lng: 0 };
+          dragDeltaMetersRef.current = { ...(gridOffsetRef.current || { x: 0, y: 0 }) };
+          if (canvasRef.current) canvasRef.current.style.cursor = "grabbing";
+          e.stopPropagation();
+          if (e.cancelable) e.preventDefault();
+          requestRedraw();
+          return;
+        }
       }
 
       // 1. VERTEX DRAGGING
@@ -1873,7 +1972,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
         return;
       }
 
-      // 3. ARRAY DRAGGING (Move Mode ON ho tabhi)
+      // 3. ARRAY DRAGGING (Move Mode ON only)
       const isAnchorHit = moveActive && anchorPxRef.current && panelsRef.current.length > 0 &&
         Math.hypot(mouseX - anchorPxRef.current.x, mouseY - anchorPxRef.current.y) < 26;
 
@@ -1918,6 +2017,16 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     mousePosPxRef.current = { x: mouseX, y: mouseY };
     const gps = toGps(mouseX, mouseY);
     if (gps) mouseGpsRef.current = gps;
+
+    // CASE A0: ROTATE DRAG
+    if (isRotatingRef.current && arrayCenterPxRef.current) {
+      const c = arrayCenterPxRef.current;
+      const curAng = Math.atan2(mouseY - c.y, mouseX - c.x) * 180 / Math.PI;
+      let newAz = rotateStartAzRef.current + (curAng - rotateStartAngleRef.current);
+      newAz = ((Math.round(newAz) % 360) + 360) % 360;
+      if (setAzimuthDegrees) setAzimuthDegrees(newAz);
+      return;
+    }
 
     // CASE A: VERTEX DRAG
     if (isDraggingVertexRef.current && draggedVertexIndexRef.current !== -1) {
@@ -2094,6 +2203,14 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
   };
 
   const handleMouseUp = (e) => {
+    // 0. ROTATE FINISH
+    if (isRotatingRef.current) {
+      isRotatingRef.current = false;
+      if (map && map.dragging) map.dragging.enable();
+      requestRedraw();
+      return;
+    }
+
     // 1. VERTEX DRAG FINISH
     if (isDraggingVertexRef.current) {
       const finalPoly = activePolyDragRef.current;
@@ -2229,7 +2346,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     }
   };
 
-  // ★ FIX EDGE-ALIGN: right-click hit radius 42px (pehle 28 tha — mushkil se pakdta tha)
+  // Edge-align: right-click hit radius 42px
   const handleContextMenu = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -2242,7 +2359,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
     const edge = findClosestRoofEdge({ x, y }, 42);
     if (edge) {
       const snapDeg = Math.round(edge.azimuthDeg);
-      // Azimuth sirf menu option click par apply hoga (handleApplyEdgeAzimuth se)
       setEdgeMenu({
         show: true,
         x: Math.min(x, rect.width - 240),
@@ -2361,8 +2477,6 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           name: "Water Tank / HVAC Keepout"
         });
       }
-      // ★ FIX KEEPOUT: tool active rehta hai — multiple keepouts laga sakte ho.
-      // Exit karne ke liye ESC dabao ya dusra tool select karo.
       requestRedraw();
       return;
     }
@@ -2515,7 +2629,7 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           type="button"
           onClick={() => setLocalMove(v => !v)}
           style={ctrlBtnStyle(moveActive)}
-          title="Move mode: ON kar ke array body ko drag kar ke reposition karo"
+          title="Move mode: ON then drag the array body to reposition it"
         >
           ✥ Move {moveActive ? "ON" : "OFF"}
         </button>
@@ -2523,55 +2637,57 @@ const HelioScopeCanvasOverlay = forwardRef(function HelioScopeCanvasOverlay({
           type="button"
           onClick={() => setLocalLock(v => !v)}
           style={ctrlBtnStyle(effLock)}
-          title="Lock: array/vertex/edge drag band — sirf map pan free"
+          title="Lock: array/vertex/edge drag disabled — only map pan free"
         >
           {effLock ? "🔒 Locked" : "🔓 Unlocked"}
         </button>
       </div>
 
-      {/* ★ Sun Time Simulation — Season presets + Hour slider + Play */}
-      <div
-        style={{
-          position: "absolute",
-          left: "50%",
-          transform: "translateX(-50%)",
-          bottom: 12,
-          zIndex: 950,
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          padding: "8px 12px",
-          borderRadius: 12,
-          background: "rgba(8,15,30,0.88)",
-          border: "1px solid rgba(56,189,248,0.25)",
-          backdropFilter: "blur(8px)",
-          pointerEvents: "auto"
-        }}
-      >
-        <button type="button" onClick={() => setTimeSim(v => !v)} style={ctrlBtnStyle(timeSim)}>
-          {timeSim ? "☀ Sim ON" : "☀ Sim OFF"}
-        </button>
-        {timeSim && (
-          <>
-            {seasonPresets.map(sp => (
-              <button key={sp.label} type="button" onClick={() => setSunDay(sp.day)} style={chipStyle(sunDay === sp.day)}>
-                {sp.label}
+      {/* Sun Time Simulation widget — hidden on Shading tab (simOverride) */}
+      {!simOverride && (
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+            bottom: 12,
+            zIndex: 950,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "8px 12px",
+            borderRadius: 12,
+            background: "rgba(8,15,30,0.88)",
+            border: "1px solid rgba(56,189,248,0.25)",
+            backdropFilter: "blur(8px)",
+            pointerEvents: "auto"
+          }}
+        >
+          <button type="button" onClick={() => setTimeSim(v => !v)} style={ctrlBtnStyle(timeSim)}>
+            {timeSim ? "☀ Sim ON" : "☀ Sim OFF"}
+          </button>
+          {timeSim && (
+            <>
+              {seasonPresets.map(sp => (
+                <button key={sp.label} type="button" onClick={() => setSunDay(sp.day)} style={chipStyle(sunDay === sp.day)}>
+                  {sp.label}
+                </button>
+              ))}
+              <input
+                type="range" min="5.5" max="18.5" step="0.25" value={sunHour}
+                onChange={(e) => setSunHour(parseFloat(e.target.value))}
+                style={{ width: 160, accentColor: "#38bdf8" }}
+              />
+              <span style={{ color: "#facc15", fontFamily: "monospace", fontSize: 11, fontWeight: 700, minWidth: 48 }}>
+                {String(Math.floor(sunHour)).padStart(2, "0")}:{String(Math.round((sunHour % 1) * 60)).padStart(2, "0")}
+              </span>
+              <button type="button" onClick={toggleSunPlay} style={ctrlBtnStyle(playing)}>
+                {playing ? "⏸ Pause" : "▶ Play"}
               </button>
-            ))}
-            <input
-              type="range" min="5.5" max="18.5" step="0.25" value={sunHour}
-              onChange={(e) => setSunHour(parseFloat(e.target.value))}
-              style={{ width: 160, accentColor: "#38bdf8" }}
-            />
-            <span style={{ color: "#facc15", fontFamily: "monospace", fontSize: 11, fontWeight: 700, minWidth: 48 }}>
-              {String(Math.floor(sunHour)).padStart(2, "0")}:{String(Math.round((sunHour % 1) * 60)).padStart(2, "0")}
-            </span>
-            <button type="button" onClick={toggleSunPlay} style={ctrlBtnStyle(playing)}>
-              {playing ? "⏸ Pause" : "▶ Play"}
-            </button>
-          </>
-        )}
-      </div>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Right-Click Roof Edge Alignment Context Menu */}
       {edgeMenu.show && (

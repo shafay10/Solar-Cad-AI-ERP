@@ -448,7 +448,8 @@ export function renderSolarArrayWithRacking(
   tiltDeg = 18,
   azimuthDeg = 180,
   roofPolygon = null,
-  siteLatitude = 31.5
+  siteLatitude = 31.5,
+  arrayScale = 1.0
 ) {
   const existing = scene.getObjectByName("solar_array_3d");
   if (existing) scene.remove(existing);
@@ -456,13 +457,20 @@ export function renderSolarArrayWithRacking(
   const arrayGroup = new THREE.Group();
   arrayGroup.name = "solar_array_3d";
 
+  // ONE single source of truth: only render actual panels from the 2D segment state
+  if (!panels || !Array.isArray(panels) || panels.length === 0) {
+    scene.add(arrayGroup);
+    return { arrayGroup, count: 0 };
+  }
+
   const degPerMeterLat = 1 / 111320;
   const degPerMeterLng = 1 / (111320 * Math.cos((centerLat * Math.PI) / 180));
 
   // Racking Heights: Flush = 0.15m, L2 = 1.5m, L3 = 2.5m
   let legElevation = 0.15;
-  if (String(rackingType).includes("L2") || rackingType === "L2_ELEVATED") legElevation = 1.5;
-  if (String(rackingType).includes("L3") || rackingType === "L3_ELEVATED") legElevation = 2.5;
+  const rTypeStr = String(rackingType || "").toUpperCase();
+  if (rTypeStr.includes("L2")) legElevation = 1.5;
+  else if (rTypeStr.includes("L3")) legElevation = 2.5;
 
   const panelMat = new THREE.MeshStandardMaterial({
     color: 0x0f172a, // Midnight dark monocrystalline wafer
@@ -476,143 +484,75 @@ export function renderSolarArrayWithRacking(
     metalness: 0.9
   });
 
-  // STRICT CAD LOGIC: If panels is empty, only pack modules if user has drawn a real roof polygon!
-  let renderPanels = panels;
-  if (!renderPanels || renderPanels.length === 0) {
-    if (roofPolygon && Array.isArray(roofPolygon) && roofPolygon.length >= 3) {
-      const res = packModulesOnRoof({
-        roofPolygonGps: roofPolygon,
-        tiltDegrees: tiltDeg,
-        azimuthDegrees: azimuthDeg,
-        siteLatitude
+  const tiltRad = ((Number(tiltDeg) || 0) * Math.PI) / 180;
+  const azRad = (((Number(azimuthDeg) || 180) - 180) * Math.PI) / 180;
+
+  panels.forEach((p) => {
+    const cGps = p.centerGps || p.center;
+    let cx = 0;
+    let cy = 0;
+
+    if (cGps && isFinite(cGps[0]) && isFinite(cGps[1])) {
+      cx = (Number(cGps[1]) - centerLng) / degPerMeterLng;
+      cy = (Number(cGps[0]) - centerLat) / degPerMeterLat;
+    } else if (p.corners && p.corners.length >= 4) {
+      let sx = 0, sy = 0;
+      p.corners.forEach(([lat, lng]) => {
+        sx += (Number(lng) - centerLng) / degPerMeterLng;
+        sy += (Number(lat) - centerLat) / degPerMeterLat;
       });
-      if (res && res.modules && res.modules.length > 0) {
-        renderPanels = res.modules;
-      }
-    } else {
-      return { arrayGroup, count: 0 };
+      cx = sx / 4;
+      cy = sy / 4;
     }
-  }
 
-  (renderPanels || []).forEach((p) => {
-    const corners = p.corners || p.cornersGps;
-    if (corners && corners.length >= 4) {
-      // Local meter corners
-      const pts = corners.map(([lat, lng]) => [
-        (lng - centerLng) / degPerMeterLng,
-        (lat - centerLat) / degPerMeterLat
-      ]);
+    const modW = p.width ? (p.width > 10 ? p.width / 1000 : p.width) : 1.096;
+    const modL = p.length ? (p.length > 10 ? p.length / 1000 : p.length) : 2.384;
 
-      // Panel Geometry
-      const pShape = new THREE.Shape();
-      pShape.moveTo(pts[0][0], pts[0][1]);
-      pShape.lineTo(pts[1][0], pts[1][1]);
-      pShape.lineTo(pts[2][0], pts[2][1]);
-      pShape.lineTo(pts[3][0], pts[3][1]);
-      pShape.closePath();
+    const pGeo = new THREE.BoxGeometry(modW, modL, 0.04);
+    const pMesh = new THREE.Mesh(pGeo, panelMat);
+    pMesh.position.set(cx, cy, roofHeight + legElevation);
+    const modAz = p.azimuth !== undefined ? (((Number(p.azimuth) - 180) * Math.PI) / 180) : azRad;
+    const modTilt = p.tilt !== undefined ? ((Number(p.tilt) * Math.PI) / 180) : tiltRad;
+    pMesh.rotation.z = -modAz;
+    pMesh.rotation.x = modTilt;
+    pMesh.castShadow = true;
+    pMesh.receiveShadow = true;
+    arrayGroup.add(pMesh);
 
-      const pGeo = new THREE.ExtrudeGeometry(pShape, { depth: 0.04, bevelEnabled: false });
-      const pMesh = new THREE.Mesh(pGeo, panelMat);
-      pMesh.position.z = roofHeight + legElevation;
-      pMesh.castShadow = true;
-      pMesh.receiveShadow = true;
-      arrayGroup.add(pMesh);
-
-      // L2 / L3 Steel Mounting Legs (4 corner pillars connecting to roof slab)
-      if (legElevation > 0.3) {
-        pts.forEach(([lx, ly]) => {
-          const legGeo = new THREE.CylinderGeometry(0.035, 0.035, legElevation, 8);
-          legGeo.rotateX(Math.PI / 2);
-          const legMesh = new THREE.Mesh(legGeo, legMat);
-          legMesh.position.set(lx, ly, roofHeight + legElevation / 2);
-          legMesh.castShadow = true;
-          legMesh.receiveShadow = true;
-          arrayGroup.add(legMesh);
-        });
-      }
-    } else {
-      // Fallback: Compute from center
-      const cGps = p.centerGps || p.center;
-      if (cGps) {
-        const cx = (cGps[1] - centerLng) / degPerMeterLng;
-        const cy = (cGps[0] - centerLat) / degPerMeterLat;
-        const modW = 1.134;
-        const modL = 2.278;
-        const pGeo = new THREE.BoxGeometry(modW, modL, 0.04);
-        const pMesh = new THREE.Mesh(pGeo, panelMat);
-        pMesh.position.set(cx, cy, roofHeight + legElevation);
-        const tiltRad = (tiltDeg * Math.PI) / 180;
-        const azRad = ((azimuthDeg - 180) * Math.PI) / 180;
-        pMesh.rotation.z = -azRad;
-        pMesh.rotation.x = tiltRad;
-        pMesh.castShadow = true;
-        pMesh.receiveShadow = true;
-        arrayGroup.add(pMesh);
-
-        if (legElevation > 0.3) {
-          const legOffsets = [
-            [-modW * 0.4, -modL * 0.4],
-            [modW * 0.4, -modL * 0.4],
-            [-modW * 0.4, modL * 0.4],
-            [modW * 0.4, modL * 0.4]
-          ];
-          legOffsets.forEach(([dx, dy]) => {
-            const legGeo = new THREE.CylinderGeometry(0.035, 0.035, legElevation, 8);
-            legGeo.rotateX(Math.PI / 2);
-            const legMesh = new THREE.Mesh(legGeo, legMat);
-            legMesh.position.set(cx + dx, cy + dy, roofHeight + legElevation / 2);
-            legMesh.castShadow = true;
-            legMesh.receiveShadow = true;
-            arrayGroup.add(legMesh);
-          });
-        }
-      } else {
-        // Safe Fallback: Default array grid arrangement if no GPS coordinates supplied (4 rows x 10 cols)
-        const idx = p.index !== undefined ? p.index : (parseInt(String(p.id).replace(/\D/g, "") || "0", 10) || 0);
-        const cols = 10;
-        const col = idx % cols;
-        const row = Math.floor(idx / cols);
-        const modW = 1.134;
-        const modL = 2.278;
-        const spacingX = 0.08;
-        const spacingY = 0.4;
-        const cx = (col - (cols - 1) / 2) * (modW + spacingX);
-        const cy = (row - 1.5) * (modL + spacingY);
-
-        const pGeo = new THREE.BoxGeometry(modW, modL, 0.04);
-        const pMesh = new THREE.Mesh(pGeo, panelMat);
-        pMesh.position.set(cx, cy, roofHeight + legElevation);
-        const tiltRad = (tiltDeg * Math.PI) / 180;
-        const azRad = ((azimuthDeg - 180) * Math.PI) / 180;
-        pMesh.rotation.z = -azRad;
-        pMesh.rotation.x = tiltRad;
-        pMesh.castShadow = true;
-        pMesh.receiveShadow = true;
-        arrayGroup.add(pMesh);
-
-        if (legElevation > 0.3) {
-          const legOffsets = [
-            [-modW * 0.4, -modL * 0.4],
-            [modW * 0.4, -modL * 0.4],
-            [-modW * 0.4, modL * 0.4],
-            [modW * 0.4, modL * 0.4]
-          ];
-          legOffsets.forEach(([dx, dy]) => {
-            const legGeo = new THREE.CylinderGeometry(0.035, 0.035, legElevation, 8);
-            legGeo.rotateX(Math.PI / 2);
-            const legMesh = new THREE.Mesh(legGeo, legMat);
-            legMesh.position.set(cx + dx, cy + dy, roofHeight + legElevation / 2);
-            legMesh.castShadow = true;
-            legMesh.receiveShadow = true;
-            arrayGroup.add(legMesh);
-          });
-        }
-      }
+    // 4 Corner Mounting Pillars
+    if (legElevation > 0.3) {
+      const cosA = Math.cos(-modAz);
+      const sinA = Math.sin(-modAz);
+      const halfW = modW * 0.45;
+      const halfL = modL * 0.45;
+      const legOffsets = [
+        [-halfW, -halfL],
+        [halfW, -halfL],
+        [halfW, halfL],
+        [-halfW, halfL]
+      ];
+      legOffsets.forEach(([ox, oy]) => {
+        const lx = cx + ox * cosA - oy * sinA;
+        const ly = cy + ox * sinA + oy * cosA;
+        const legGeo = new THREE.CylinderGeometry(0.025, 0.025, legElevation, 8);
+        legGeo.rotateX(Math.PI / 2);
+        const legMesh = new THREE.Mesh(legGeo, legMat);
+        legMesh.position.set(lx, ly, roofHeight + legElevation / 2);
+        legMesh.castShadow = true;
+        legMesh.receiveShadow = true;
+        arrayGroup.add(legMesh);
+      });
     }
   });
 
+  // Scale array group uniformly around its center
+  const effScale = Number(arrayScale) || 1.0;
+  if (effScale > 0) {
+    arrayGroup.scale.setScalar(effScale);
+  }
+
   scene.add(arrayGroup);
-  return { arrayGroup, count: (renderPanels || []).length };
+  return { arrayGroup, count: panels.length };
 }
 
 // =============================================================================

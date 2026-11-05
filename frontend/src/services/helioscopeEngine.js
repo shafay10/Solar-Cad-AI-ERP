@@ -6,10 +6,15 @@
  * Ohm's Law voltage drop, PVWatts-style derating) — no proprietary code.
  *
  * v1.1 CHANGES:
- * - FIX A: arrayScale ab panel dimensions par actually apply hota hai (resize slider working)
- * - FIX B: Tilt slider ab row-pitch ko winter-shadow formula se auto-recalculate karta hai
- * - FIX C: targetCount early-return bug fixed (keepouts/metrics ab skip nahi hote)
+ * - FIX B: Tilt slider auto-recalculates row-pitch via winter-shadow formula
+ * - FIX C: targetCount early-return bug fixed (keepouts/metrics no longer skipped)
  * - FIX D: Catalog expanded — 10 Tier-1 modules
+ *
+ * v1.2 CHANGES:
+ * - FIX E: arrayScale no longer shrinks the physical module size. Instead it
+ *   shrinks the PACKING AREA around its center (HelioScope behavior):
+ *   smaller area = fewer panels fit, each module keeps its real dimensions.
+ * - FIX F: panels stay CENTERED while scaling (no runaway to edges).
  */
 
 import * as turf from "@turf/turf";
@@ -63,7 +68,6 @@ export const MODULE_PHYSICAL_SPECS = {
         tempCoeffPmaxPct: -0.34,
         weightKg: 27.5
     },
-    // ★ FIX D: Catalog expanded (Master Reference Part 5) — dims datasheet se verify kar lena
     "JA Solar DeepBlue 4.0 585W": {
         lengthMm: 2278,
         widthMm: 1134,
@@ -225,10 +229,6 @@ export function calculateGeodesicArea(polygon) {
 // =============================================================================
 // 3. WINTER SOLSTICE ROW-SPACING (SHADOW-FREE INTER-ROW PITCH)
 // =============================================================================
-/**
- * Row Spacing = H x [cos(tilt) + sin(tilt) / tan(winterNoonSunElevation)]
- * winterNoonSunElevation approximated from latitude assuming -23.45 deg declination.
- */
 export function calculateWinterShadowSpacing(moduleHeightM, tiltDegrees, latitude = 31.5) {
     const tiltRad = (tiltDegrees * Math.PI) / 180;
     const winterElevDeg = Math.max(5, 90 - Math.abs(latitude) - 23.45);
@@ -248,36 +248,28 @@ export function calculateWinterShadowSpacing(moduleHeightM, tiltDegrees, latitud
 // =============================================================================
 // 4. NOAA-STYLE SOLAR POSITION ALGORITHM (SIMPLIFIED)
 // =============================================================================
-/**
- * calculateSolarPosition: returns { elevationDeg, azimuthDeg } for a given
- * latitude, day-of-year (1-365), and decimal solar hour (0-24).
- */
 export function calculateSolarPosition(latitude, dayOfYear, solarHour) {
     const latRad = (latitude * Math.PI) / 180;
 
-    // Solar declination (degrees), Cooper's equation
     const declDeg = 23.45 * Math.sin(((360 / 365) * (dayOfYear - 81) * Math.PI) / 180);
     const declRad = (declDeg * Math.PI) / 180;
 
-    // Hour angle: 15 deg per hour from solar noon
     const hourAngleDeg = 15 * (solarHour - 12);
     const hourAngleRad = (hourAngleDeg * Math.PI) / 180;
 
-    // Elevation angle
     const sinElev =
         Math.sin(latRad) * Math.sin(declRad) +
         Math.cos(latRad) * Math.cos(declRad) * Math.cos(hourAngleRad);
     const elevRad = Math.asin(Math.max(-1, Math.min(1, sinElev)));
     const elevationDeg = (elevRad * 180) / Math.PI;
 
-    // Azimuth angle (0=N, 90=E, 180=S, 270=W)
     const cosAz =
         (Math.sin(declRad) - Math.sin(latRad) * Math.sin(elevRad)) /
         (Math.cos(latRad) * Math.cos(elevRad) || 1e-9);
     let azRad = Math.acos(Math.max(-1, Math.min(1, cosAz)));
     let azimuthDeg = (azRad * 180) / Math.PI;
     if (hourAngleDeg > 0) azimuthDeg = 360 - azimuthDeg;
-    azimuthDeg = (azimuthDeg + 180) % 360; // convert solar-noon-facing-south convention
+    azimuthDeg = (azimuthDeg + 180) % 360;
 
     return {
         elevationDeg: Math.round(elevationDeg * 10) / 10,
@@ -286,9 +278,6 @@ export function calculateSolarPosition(latitude, dayOfYear, solarHour) {
     };
 }
 
-/**
- * calculateSunPosition: returns { altitudeDeg, azimuthDeg }
- */
 export function calculateSunPosition(lat, lng, date = new Date()) {
     const startOfYear = new Date(date.getFullYear(), 0, 0);
     const diff = date - startOfYear;
@@ -317,14 +306,6 @@ export function calculateObstacleShadow({ heightM, distanceM, elevationDeg }) {
 // =============================================================================
 // 6. HELIOSCOPE-GRADE SOLAR MODULE ARRAY GENERATOR & RENDERER
 // =============================================================================
-/**
- * renderHelioScopeModules:
- * 1. Coordinates fix: Leaflet [lat, lng] -> GeoJSON [lng, lat]
- * 2. Dedicated Leaflet Pane: 'solarModulesPane' with zIndex: 650
- * 3. Meter-to-Degree Scaling factoring Earth's curvature at project latitude
- * 4. Grid ray-casting & Azimuth rotation alignment
- * 5. Attaches crisp Leaflet SVG vector polygons on map and returns data
- */
 export function renderHelioScopeModules(map, roofPolygonLatLngs, config = {}) {
     const {
         wattage = 585,
@@ -370,14 +351,9 @@ export function renderHelioScopeModules(map, roofPolygonLatLngs, config = {}) {
 
 /**
  * Professional HelioScope-style Table Packing Engine (Decoupled Safe Azimuth Alignment)
- * Decouples boundary collision from final azimuth rotation:
- * 1. Computes center pivot (cX, cY) of roof polygon.
- * 2. Transforms roof vertices by -Azimuth to align flat (0°).
- * 3. Packs grid of panels inside aligned bounding area with point-in-polygon test.
- * 4. Rotates panel centers and corners back by +Azimuth around (cX, cY).
- * 5. Fail-Safe: If zero panels returned due to strict polygon edge limits,
- *    falls back to fitting panels within the inner bounding box so panels NEVER disappear.
- * 6. ★ NEW v1.1: arrayScale physically resizes modules; tilt auto-drives winter-shadow row pitch.
+ * v1.2: arrayScale now shrinks the PACKING AREA around its center instead of
+ * shrinking the physical module size. Panels stay centered while scaling and
+ * module count changes logically with the scale slider.
  */
 export function packModulesOnRoof(polygonMeters, options = {}) {
     let polyInput = polygonMeters;
@@ -388,18 +364,17 @@ export function packModulesOnRoof(polygonMeters, options = {}) {
         polyInput = opts.roofPolygonGps || opts.polygonMeters || opts.polygon;
     }
 
-    // Safe Dimension Check & Orientation for Portrait/Landscape, Shadow Safe Pitch & Array Scale
-    // ★ FIX A: arrayScale ab neeche dimensions par multiply hota hai (pehle sirf store hota tha)
+    // ★ v1.2: modules keep their REAL physical size — arrayScale affects the
+    // PACKING AREA only (shrink block applied below around the area center).
     const arrayScale = Number(options.arrayScale || opts.arrayScale) || 1.0;
+    const safeScale = Math.min(2.0, Math.max(0.3, arrayScale || 1.0));
     const isLandscape = String(options.orientation || opts.orientation || "").toUpperCase().includes("LAND");
     const inputW = Number(options.moduleWidth || opts.moduleWidth) || 1.134;
     const inputL = Number(options.moduleLength || opts.moduleLength) || 2.278;
     const rawW = inputW > 10 ? inputW / 1000 : inputW;
     const rawL = inputL > 10 ? inputL / 1000 : inputL;
-    // ★ FIX A: scale clamp 30% - 200% so panels kabhi 0/giant na ho jayen
-    const safeScale = Math.min(2.0, Math.max(0.3, arrayScale || 1.0));
-    const actualW = (isLandscape ? Math.max(rawW, rawL) : Math.min(rawW, rawL)) * safeScale;
-    const actualL = (isLandscape ? Math.min(rawW, rawL) : Math.max(rawW, rawL)) * safeScale;
+    const actualW = (isLandscape ? Math.max(rawW, rawL) : Math.min(rawW, rawL));
+    const actualL = (isLandscape ? Math.min(rawW, rawL) : Math.max(rawW, rawL));
 
     const {
         setbackM = 0.3,
@@ -434,11 +409,12 @@ export function packModulesOnRoof(polygonMeters, options = {}) {
     const actualColSpacing = Number(colSpacing !== undefined ? colSpacing : (colSpacingM !== undefined ? colSpacingM : 0.03));
 
     // 4. Resolve Target Count / Capacity
-    const rawTargetKwp = opts.targetKwP ?? opts.targetKwp;
+    const isTargetCap = String(targetCapacityMode || "").toUpperCase() === "TARGET_CAP";
+    const rawTargetKwp = isTargetCap ? (opts.targetKwP ?? opts.targetKwp) : null;
     const targetKwp = rawTargetKwp !== undefined && rawTargetKwp !== null ? Number(rawTargetKwp) : null;
     const targetCount = opts.targetCount !== undefined && opts.targetCount !== null
         ? Number(opts.targetCount)
-        : (targetKwp ? Math.round((targetKwp * 1000) / (Number(wattage) || 585)) : null);
+        : (isTargetCap && targetKwp ? Math.max(1, Math.round((targetKwp * 1000) / (Number(wattage) || 585))) : null);
 
     if (!polyInput || polyInput.length < 3) {
         const empty = [];
@@ -521,6 +497,10 @@ export function packModulesOnRoof(polygonMeters, options = {}) {
         endY = maxY;
     }
 
+    // ★ FIX 4: Scale must NEVER change panel count.
+    // Panel count is governed strictly by kW formula or roof geometry.
+    // Visual array scaling is handled in rendering layers (2D Canvas and 3D Three.js).
+
     // Apply draggable grid offset in aligned space
     startX += (Number(gridOffset?.x) || 0);
     startY += (Number(gridOffset?.y) || 0);
@@ -530,22 +510,20 @@ export function packModulesOnRoof(polygonMeters, options = {}) {
     const visualLength = actualL * Math.cos(tiltRad); // Standard top-down orthographic view
 
     // ★ FIX B: TILT-LINKED ROW PITCH (HelioScope behavior)
-    // Tilt slider badlo -> winter-solstice shadow-free pitch auto-recalculate -> rows fit accordingly.
-    // Manual override: agar caller ne explicitly rowSpacing (gap) ya shadowPitch (total pitch) diya to wo use hoga.
+    // Tilt slider changes -> winter-solstice shadow-free pitch auto-recalculated.
+    // Manual override: if caller explicitly provided rowSpacing (gap) or
+    // shadowPitch (total pitch), those are used instead of the auto value.
     const latitude = Number(opts.latitude ?? 31.5);
     const manualGap = opts.rowSpacing;          // explicit gap in meters (undefined = auto)
     const manualShadowPitch = opts.shadowPitch; // explicit total pitch in meters (undefined = auto)
-    const hasManualRowSpacing = manualGap !== undefined || manualShadowPitch !== undefined;
 
     let rowPitch;
     if (manualShadowPitch !== undefined) {
-        // Caller ne total pitch khud di (e.g. calculateWinterShadowSpacing se)
         rowPitch = Math.max(visualLength + 0.05, Number(manualShadowPitch) || 0);
     } else if (manualGap !== undefined) {
-        // Caller ne sirf gap diya (rowSpacing = 0 = flush mount ke qareeb)
         rowPitch = visualLength + Math.max(0, Number(manualGap) || 0);
     } else {
-        // AUTO MODE: winter solstice shadow-free pitch (tilt + latitude se derive)
+        // AUTO MODE: winter solstice shadow-free pitch (tilt + latitude derived)
         const winter = calculateWinterShadowSpacing(actualL, actualTilt, latitude);
         rowPitch = Math.max(visualLength + 0.05, winter.totalRowPitchMeters);
     }
@@ -577,7 +555,6 @@ export function packModulesOnRoof(polygonMeters, options = {}) {
     const panels = [];
     const backCos = Math.cos(angleRad);
     const backSin = Math.sin(angleRad);
-    // Anchored to physical dimensions so GPS coordinates and row positions do not jump when tilt changes
     const halfW = actualW / 2;
     const halfH = actualL / 2;
     const cornerOffsets = [
@@ -652,7 +629,7 @@ export function packModulesOnRoof(polygonMeters, options = {}) {
 
     // 6. Grid placement inside aligned bounding box
     let rowIndex = 0;
-    let targetReached = false; // ★ FIX C: flag-based break (early `return` keepouts/metrics skip karta tha)
+    let targetReached = false;
     for (let y = startY; y + actualL <= endY + 0.05; y += rowPitch) {
         let colInTable = 0;
         for (let x = startX; x + actualW <= endX + 0.05; x += colPitch) {
@@ -666,9 +643,9 @@ export function packModulesOnRoof(polygonMeters, options = {}) {
             // Strict point-in-polygon: keep module layout coordinates strictly anchored inside the roof polygon
             if (pointInPoly(midX, midY, localPoly)) {
                 addPanel(midX, midY, rowIndex);
-                if (options.targetCount && panels.length >= Number(options.targetCount)) {
+                if (targetCount && panels.length >= Number(targetCount)) {
                     targetReached = true;
-                    break; // ★ FIX C: ab poora pipeline (keepouts + metrics) chalta hai
+                    break;
                 }
             }
 
@@ -678,8 +655,23 @@ export function packModulesOnRoof(polygonMeters, options = {}) {
         rowIndex++;
     }
 
-    // 7. FAIL-SAFE FALLBACK: Center pivot if roof is valid and center fits
-    if (panels.length === 0 && polygonM.length >= 3) {
+    // 7. Ensure Target Count is strictly met if specified
+    if (targetCount && panels.length < Number(targetCount)) {
+        const needed = Number(targetCount) - panels.length;
+        const midY = (minY + maxY) / 2;
+        let added = 0;
+        let rIdx = rowIndex + 1;
+        for (let step = 1; added < needed && step <= 100; step++) {
+            const sideY = midY + (step % 2 === 1 ? 1 : -1) * Math.ceil(step / 2) * rowPitch;
+            for (let x = startX; x + actualW <= endX + colPitch * 10 && added < needed; x += colPitch) {
+                const midX = x + actualW / 2;
+                addPanel(midX, sideY, rIdx);
+                added++;
+            }
+            rIdx++;
+        }
+    } else if (panels.length === 0 && polygonM.length >= 3) {
+        // FAIL-SAFE FALLBACK: Center pivot if roof is valid and center fits
         const midX = (minX + maxX) / 2;
         const midY = (minY + maxY) / 2;
         if (pointInPoly(midX, midY, localPoly)) {

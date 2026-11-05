@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Clock, X, Sparkles, Building2 } from "lucide-react";
 import { renderSolarArrayWithRacking, renderUserObstacles3D } from "../services/helioscope3DEnvironment.js";
+import { calculateSolarPosition } from "../services/helioscopeEngine.js";
 
 /**
  * Generates Photorealistic Tier-1 TOPCon Half-Cut Solar Panel Texture
@@ -172,6 +173,8 @@ export default function HelioScope3DView({
   panels = [],
   tiltDegrees = 18,
   azimuthDegrees = 180,
+  arrayScale = 1.0,
+  onScaleChange,
   initialSolarHour = 12.0,
   siteLatitude = 33.6844,
   siteLongitude = 73.0479,
@@ -200,9 +203,18 @@ export default function HelioScope3DView({
     if (propRackingType) setRackingType(normalizeRacking(propRackingType));
   }, [propRackingType]);
 
-  const [livePanelCount, setLivePanelCount] = useState(systemStats.modulesCount || (panels && panels.length) || 0);
+  const [livePanelCount, setLivePanelCount] = useState(panels?.length || systemStats.modulesCount || 0);
   const [arrayRotation, setArrayRotation] = useState(azimuthDegrees || 180);
-  const [arrayScale, setArrayScale] = useState(1.0);
+
+  useEffect(() => {
+    if (azimuthDegrees !== undefined && !isNaN(azimuthDegrees)) {
+      setArrayRotation(azimuthDegrees);
+    }
+  }, [azimuthDegrees]);
+
+  useEffect(() => {
+    setLivePanelCount(panels ? panels.length : 0);
+  }, [panels]);
 
   const sceneRef = useRef(null);
   const rendererRef = useRef(null);
@@ -212,19 +224,10 @@ export default function HelioScope3DView({
 
   const handleRotationChange = (newDeg) => {
     setArrayRotation(newDeg);
-    const arrayMesh = sceneRef.current?.getObjectByName("solar_array_3d");
-    if (arrayMesh) arrayMesh.rotation.z = -(newDeg * Math.PI) / 180;
     if (typeof onAzimuthChange === "function") onAzimuthChange(newDeg);
   };
 
-  const handleScaleChange = (newScale) => {
-    const clamped = Math.max(0.4, Math.min(3.0, Number(newScale.toFixed(1))));
-    setArrayScale(clamped);
-    const arrayMesh = sceneRef.current?.getObjectByName("solar_array_3d");
-    if (arrayMesh) arrayMesh.scale.set(clamped, clamped, 1);
-  };
-
-  // Keyboard Shortcuts (R for rotate, +/- for scale)
+  // Keyboard Shortcuts: R to rotate, +/- to scale
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
@@ -235,38 +238,44 @@ export default function HelioScope3DView({
           return next;
         });
       } else if (e.key === "+" || e.key === "=") {
-        setArrayScale((prev) => {
-          const next = Math.min(3.0, Number((prev + 0.1).toFixed(1)));
-          handleScaleChange(next);
-          return next;
-        });
+        if (typeof onScaleChange === "function") {
+          onScaleChange((prev) => Math.min(3.0, Number((prev + 0.1).toFixed(2))));
+        }
       } else if (e.key === "-" || e.key === "_") {
-        setArrayScale((prev) => {
-          const next = Math.max(0.4, Number((prev - 0.1).toFixed(1)));
-          handleScaleChange(next);
-          return next;
-        });
+        if (typeof onScaleChange === "function") {
+          onScaleChange((prev) => Math.max(0.1, Number((prev - 0.1).toFixed(2))));
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [onScaleChange]);
 
   const centroid = React.useMemo(() => {
-    let centerLat = Number(siteLatitude) || 31.5;
-    let centerLng = Number(siteLongitude) || 74.3;
-
+    if (Array.isArray(panels) && panels.length > 0) {
+      let sumLat = 0, sumLng = 0, validCount = 0;
+      panels.forEach(p => {
+        const c = p.centerGps || p.center;
+        if (c && isFinite(c[0]) && isFinite(c[1])) {
+          sumLat += Number(c[0]);
+          sumLng += Number(c[1]);
+          validCount++;
+        }
+      });
+      if (validCount > 0) {
+        return { lat: sumLat / validCount, lng: sumLng / validCount };
+      }
+    }
     if (Array.isArray(roofPolygon) && roofPolygon.length >= 3) {
       let sumLat = 0, sumLng = 0;
       roofPolygon.forEach(([lat, lng]) => {
         sumLat += Number(lat);
         sumLng += Number(lng);
       });
-      centerLat = sumLat / roofPolygon.length;
-      centerLng = sumLng / roofPolygon.length;
+      return { lat: sumLat / roofPolygon.length, lng: sumLng / roofPolygon.length };
     }
-    return { lat: centerLat, lng: centerLng };
-  }, [roofPolygon, siteLatitude, siteLongitude]);
+    return { lat: Number(siteLatitude) || 33.6844, lng: Number(siteLongitude) || 73.0479 };
+  }, [panels, roofPolygon, siteLatitude, siteLongitude]);
 
   // Three.js Scene Setup
   useEffect(() => {
@@ -357,13 +366,33 @@ export default function HelioScope3DView({
   }, []);
 
   // Update Directional Sun Light on Hour change
+  // FIX: Ensure accurate sun position based on solar hour and site latitude
   useEffect(() => {
     if (!sunLightRef.current) return;
-    const phi = ((solarHour - 6) / 12) * Math.PI;
-    sunLightRef.current.position.set(Math.cos(phi) * 80, -Math.sin(phi) * 40, Math.sin(phi) * 80);
-  }, [solarHour]);
+    
+    // Calculate accurate sun position using NOAA algorithm
+    const sunPos = calculateSolarPosition(siteLatitude, 172, solarHour); // Summer solstice (day 172) for maximum shadows
+    
+    // Convert azimuth and elevation to 3D coordinates
+    const elevRad = (sunPos.elevationDeg * Math.PI) / 180;
+    const azimRad = ((sunPos.azimuthDeg - 180) * Math.PI) / 180; // Adjust for Three.js coordinate system
+    
+    const sunDistance = 100;
+    const sunX = Math.cos(azimRad) * Math.cos(elevRad) * sunDistance;
+    const sunY = Math.sin(azimRad) * Math.cos(elevRad) * sunDistance;
+    const sunZ = Math.sin(elevRad) * sunDistance;
+    
+    sunLightRef.current.position.set(sunX, sunY, sunZ);
+    
+    // Adjust shadow camera frustum based on sun position
+    if (sunLightRef.current.shadow && sunLightRef.current.shadow.camera) {
+      const shadowCam = sunLightRef.current.shadow.camera;
+      shadowCam.position.copy(sunLightRef.current.position);
+      shadowCam.lookAt(0, 0, buildingHeightM);
+    }
+  }, [solarHour, siteLatitude]);
 
-  // Render Solar Array Modules
+  // Render Solar Array Modules — panels strictly from the 2D segment (no dummy fallback)
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
@@ -371,28 +400,16 @@ export default function HelioScope3DView({
     const existing = scene.getObjectByName("solar_array_3d");
     if (existing) scene.remove(existing);
 
-    // ALWAYS provide default panels so screen is never blank
-    const degPerMeterLat = 1 / 111320;
-    const degPerMeterLng = 1 / (111320 * Math.cos(((centroid.lat || 31.5) * Math.PI) / 180));
-    const effectivePanels = (panels && panels.length > 0)
-      ? panels
-      : Array.from({ length: 40 }, (_, i) => {
-          const col = i % 10;
-          const row = Math.floor(i / 10);
-          const x = (col - 4.5) * 1.25;
-          const y = (row - 1.5) * 2.5;
-          return {
-            id: `p-${i}`,
-            index: i,
-            centerGps: [centroid.lat + y * degPerMeterLat, centroid.lng + x * degPerMeterLng]
-          };
-        });
+    if (!panels || panels.length === 0) {
+      setLivePanelCount(0);
+      return;
+    }
 
-    setLivePanelCount(effectivePanels.length);
+    setLivePanelCount(panels.length);
 
     const res = renderSolarArrayWithRacking(
       scene,
-      effectivePanels,
+      panels,
       centroid.lat,
       centroid.lng,
       buildingHeightM,
@@ -400,7 +417,8 @@ export default function HelioScope3DView({
       tiltDegrees,
       azimuthDegrees,
       roofPolygon,
-      siteLatitude
+      siteLatitude,
+      arrayScale
     );
 
     if (res && res.count >= 0) setLivePanelCount(res.count);
@@ -409,8 +427,7 @@ export default function HelioScope3DView({
     const solarTex = generateHighFidelitySolarTexture();
     const arrayGroup = scene.getObjectByName("solar_array_3d");
     if (arrayGroup) {
-      arrayGroup.rotation.z = -(arrayRotation * Math.PI) / 180;
-      arrayGroup.scale.set(arrayScale, arrayScale, 1);
+      arrayGroup.scale.setScalar(Number(arrayScale) || 1.0);
 
       arrayGroup.traverse((child) => {
         if (child.isMesh && child.geometry && child.geometry.type !== "CylinderGeometry") {
@@ -420,22 +437,23 @@ export default function HelioScope3DView({
             roughness: 0.2,
             metalness: 0.6
           });
+          child.castShadow = true;
+          child.receiveShadow = true;
           child.material.needsUpdate = true;
         }
       });
     }
-  }, [panels, centroid, buildingHeightM, rackingType, tiltDegrees, azimuthDegrees, roofPolygon, siteLatitude]);
+  }, [panels, centroid, buildingHeightM, rackingType, tiltDegrees, azimuthDegrees, roofPolygon, siteLatitude, arrayScale]);
 
-  // Synchronize dynamic rotation and scale
+  // Synchronize visual array scale live
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
     const arrayMesh = scene.getObjectByName("solar_array_3d");
     if (arrayMesh) {
-      arrayMesh.rotation.z = -(arrayRotation * Math.PI) / 180;
-      arrayMesh.scale.set(arrayScale, arrayScale, 1);
+      arrayMesh.scale.setScalar(Number(arrayScale) || 1.0);
     }
-  }, [arrayRotation, arrayScale]);
+  }, [arrayScale]);
 
   // Transparent CAD Ground Grid
   useEffect(() => {
@@ -554,8 +572,8 @@ export default function HelioScope3DView({
               type="button"
               onClick={() => handleRotationChange(deg)}
               className={`py-1 rounded text-[10px] font-mono border transition cursor-pointer ${arrayRotation === deg
-                  ? "bg-emerald-600 text-white border-emerald-500 font-bold"
-                  : "bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300"
+                ? "bg-emerald-600 text-white border-emerald-500 font-bold"
+                : "bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300"
                 }`}
             >
               {deg}°
@@ -563,32 +581,40 @@ export default function HelioScope3DView({
           ))}
         </div>
 
-        {/* Array Scale */}
-        <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800">
-          <span className="text-slate-400">Scale:</span>
-          <div className="flex items-center gap-1.5">
+        {/* Scale Controller (Shared with 2D) */}
+        <div className="flex flex-col gap-1 mt-1 border-t border-slate-800/80 pt-1.5">
+          <div className="flex justify-between text-slate-400">
+            <span>Scale (Size only):</span>
+            <span className="font-mono text-emerald-400 font-bold">{Math.round((arrayScale || 1.0) * 100)}%</span>
+          </div>
+          <div className="flex items-center gap-1.5 mt-0.5">
             <button
               type="button"
-              onClick={() => handleScaleChange(arrayScale - 0.1)}
-              className="w-6 h-6 flex items-center justify-center bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded font-bold cursor-pointer text-slate-200 text-xs"
+              onClick={() => onScaleChange && onScaleChange((prev) => Math.max(0.1, Number((prev - 0.1).toFixed(2))))}
+              className="flex-1 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded text-xs font-bold cursor-pointer transition text-center"
             >
-              -
+              - Shrink
             </button>
-            <span className="font-mono text-emerald-400 w-10 text-center font-bold">
-              {(arrayScale * 100).toFixed(0)}%
-            </span>
             <button
               type="button"
-              onClick={() => handleScaleChange(arrayScale + 0.1)}
-              className="w-6 h-6 flex items-center justify-center bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded font-bold cursor-pointer text-slate-200 text-xs"
+              onClick={() => onScaleChange && onScaleChange((prev) => Math.min(3.0, Number((prev + 0.1).toFixed(2))))}
+              className="flex-1 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded text-xs font-bold cursor-pointer transition text-center"
             >
-              +
+              + Enlarge
             </button>
           </div>
         </div>
 
+        {/* Panel Count — read only; count is driven by 2D packing engine */}
+        <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800">
+          <span className="text-slate-400">Panels:</span>
+          <span className="font-mono text-emerald-400 font-bold text-sm">
+            {livePanelCount} <span className="text-[10px] text-slate-400 font-normal">modules</span>
+          </span>
+        </div>
+
         <div className="text-[9px] text-slate-500 text-center mt-0.5 border-t border-slate-800/60 pt-1">
-          Hotkeys: <kbd className="font-mono bg-slate-800 px-1 py-0.5 rounded text-slate-400">R</kbd> Rotate • <kbd className="font-mono bg-slate-800 px-1 py-0.5 rounded text-slate-400">+/-</kbd> Scale
+          Hotkeys: <kbd className="font-mono bg-slate-800 px-1 py-0.5 rounded text-slate-400">R</kbd> Rotate &bull; <kbd className="font-mono bg-slate-800 px-1 py-0.5 rounded text-slate-400">+/-</kbd> Scale
         </div>
       </div>
 

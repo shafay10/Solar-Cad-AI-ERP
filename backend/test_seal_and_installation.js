@@ -66,15 +66,15 @@ async function runTests() {
   }
   console.log("✅ Proposal unlocked successfully!");
 
-  // 5. Test Seal with Admin Passkey "7860"
-  console.log("\n[Test 3] Testing Proposal Seal with Admin Passkey '7860'...");
+  // 5. Test Seal with Official Approval Password
+  console.log("\n[Test 3] Testing Proposal Seal with Official Approval Password...");
   const seal2 = await fetch(`${API_BASE}/projects/${testProject.id}/approve`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify({ password: "7860" })
+    body: JSON.stringify({ password: "Password123!" })
   });
   const seal2Data = await seal2.json();
   console.log("Status:", seal2.status, "Message:", seal2Data.message);
@@ -82,7 +82,7 @@ async function runTests() {
     console.error("❌ Seal 2 failed:", seal2Data);
     process.exit(1);
   }
-  console.log("✅ Proposal sealed with Admin passkey!");
+  console.log("✅ Proposal sealed with official approval password!");
 
   // 6. Test Physical Installation Complete
   console.log("\n[Test 4] Testing Seal Physical Installation Complete...");

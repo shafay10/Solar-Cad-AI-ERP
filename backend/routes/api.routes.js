@@ -200,12 +200,7 @@ router.post("/auth/login", async (req, res) => {
     }
 
     let isMatch = await bcrypt.compare(password, user.passwordHash);
-    if (!isMatch && user.email.toLowerCase() === "admin@greentech.pk") {
-      const allowedAdminPasswords = ["Password123!", "admin", "admin123", "Admin123!", "greentech", "greentech123", "password"];
-      if (allowedAdminPasswords.includes(password)) {
-        isMatch = true;
-      }
-    }
+    // STRICT: No backup passwords allowed - only official password hash comparison
     if (!isMatch) {
       return res.status(401).json({ error: "Invalid email or credentials." });
     }
@@ -1301,11 +1296,8 @@ router.patch("/projects/:id/approve", verifyToken, async (req, res) => {
     const configuredPassword = (zeroDataStore.securitySettings?.approvalPassword || "Password123!").trim();
     let isPasswordValid = false;
 
+    // STRICT: Only allow configured approval password or user's own password hash
     if (inputPassword && (inputPassword === configuredPassword || inputPassword.toLowerCase() === configuredPassword.toLowerCase())) {
-      isPasswordValid = true;
-    } else if (inputPassword && (inputPassword === "Password123!" || inputPassword.toLowerCase() === "password123!")) {
-      isPasswordValid = true;
-    } else if (inputPassword && ["7860", "admin", "admin123", "Admin123!", "greentech", "greentech123", "password", "passkey"].includes(inputPassword)) {
       isPasswordValid = true;
     } else if (inputPassword && user?.id) {
       try {
@@ -1316,11 +1308,6 @@ router.patch("/projects/:id/approve", verifyToken, async (req, res) => {
       } catch (err) {
         console.warn("User password comparison note:", err.message);
       }
-    }
-
-    // If logged-in user is Super-Admin, allow sealing with any submitted password or passkey
-    if (!isPasswordValid && isSuperAdmin) {
-      isPasswordValid = true;
     }
 
     if (!isPasswordValid) {
@@ -1426,10 +1413,6 @@ router.patch("/projects/:id/unlock", verifyToken, async (req, res) => {
 
     if (inputPassword && (inputPassword === configuredPassword || inputPassword.toLowerCase() === configuredPassword.toLowerCase())) {
       isPasswordValid = true;
-    } else if (inputPassword && (inputPassword === "Password123!" || inputPassword.toLowerCase() === "password123!")) {
-      isPasswordValid = true;
-    } else if (inputPassword && ["7860", "admin", "admin123", "Admin123!", "greentech", "greentech123", "password", "passkey"].includes(inputPassword)) {
-      isPasswordValid = true;
     } else if (inputPassword && user?.id) {
       try {
         const fullUser = await prisma.user.findUnique({ where: { id: user.id } });
@@ -1439,10 +1422,6 @@ router.patch("/projects/:id/unlock", verifyToken, async (req, res) => {
       } catch (err) {
         console.warn("User password comparison note on unlock:", err.message);
       }
-    }
-
-    if (!isPasswordValid && isSuperAdmin) {
-      isPasswordValid = true;
     }
 
     if (!isPasswordValid) {
