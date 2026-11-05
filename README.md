@@ -254,3 +254,4 @@ npm run build:frontend
 This software is proprietary and confidential. Unauthorized copying, modification, or distribution is strictly prohibited.
 
 **Built with ☀️ for Green Tech Power & Clean Energy Engineers.**
+
